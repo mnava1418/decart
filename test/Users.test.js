@@ -103,11 +103,11 @@ contract('Users', ([deployer, premiumUser, freeUser, uncreatedUser, secondPremiu
                     isFollowed.should.equal(true)
                 })
 
-                it('emit UserInteraction event', () => {
+                it('emit FollowUser event', () => {
                     const log = result.logs[0]
                     const event = log.args
         
-                    log.event.should.equal('UserInteraction')
+                    log.event.should.equal('FollowUser')
                     event.currentUser.should.equal(deployer)
                     event.followedUser.should.equal(premiumUser)
                 })
@@ -137,11 +137,11 @@ contract('Users', ([deployer, premiumUser, freeUser, uncreatedUser, secondPremiu
                     isFollowed.should.equal(true)
                 })
 
-                it('emit UserInteraction event', () => {
+                it('emit FollowUser event', () => {
                     const log = result.logs[0]
                     const event = log.args
         
-                    log.event.should.equal('UserInteraction')
+                    log.event.should.equal('FollowUser')
                     event.currentUser.should.equal(deployer)
                     event.followedUser.should.equal(freeUser)
                 })
@@ -181,6 +181,46 @@ contract('Users', ([deployer, premiumUser, freeUser, uncreatedUser, secondPremiu
                 isFollowed.should.equal(false)
                 isFollowing.should.equal(false)  
             })
+        })
+    })
+    describe('unfollowUser', () => {
+        describe('success', () => {            
+            beforeEach(async () => {
+                await users.createUser('name', 'test@test.com', 'profilePic', convertToETH(0), {from: freeUser, value: convertToETH(0.1)})                
+                await users.followUser(freeUser, {from: deployer})                
+            })            
+
+            it('deployer follows freeUser', async() => {
+                const isFollowing = await users.followings(deployer, freeUser)
+                isFollowing.should.equal(true)
+            })
+
+            it('freeUser is followed by deployer', async () => {
+                const isFollowed = await users.followers(freeUser, deployer)
+                isFollowed.should.equal(true)
+            })
+
+            it('deployer unfollows freeUser', async() => {
+                await users.unfollowUser(freeUser, {from: deployer})
+                const isFollowing = await users.followings(deployer, freeUser)
+                isFollowing.should.equal(false)
+            })
+
+            it('freeUser is unfollowed by deployer', async () => {
+                await users.unfollowUser(freeUser, {from: deployer})
+                const isFollowed = await users.followers(freeUser, deployer)
+                isFollowed.should.equal(false)
+            })
+        })
+
+        describe('failure', () => {                  
+            it('invalid address', async () => {
+                await users.unfollowUser(ETH, {from: deployer}).should.be.rejected                
+            })
+
+            it('user not created', async () => {
+                await users.unfollowUser(uncreatedUser, {from: deployer}).should.be.rejected                
+            })           
         })
     })
 })

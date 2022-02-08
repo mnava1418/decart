@@ -26,7 +26,7 @@ contract Users {
     address userAddress
   );
 
-  event UserInteraction(
+  event FollowUser(
     address currentUser,
     address followedUser
   );
@@ -62,6 +62,14 @@ contract Users {
     followings[msg.sender][_addressToFollow] = true;
     followers[_addressToFollow][msg.sender] = true;
 
-    emit UserInteraction(msg.sender, _addressToFollow);    
+    emit FollowUser(msg.sender, _addressToFollow);    
+  }
+
+  function unfollowUser(address _addressToUnfollow) public {
+    require(_addressToUnfollow != address(0), 'Invalid user');
+    require(users[_addressToUnfollow].valid, 'Usuario no existe');
+
+    followings[msg.sender][_addressToUnfollow] = false;
+    followers[_addressToUnfollow][msg.sender] = false;
   }
 }
