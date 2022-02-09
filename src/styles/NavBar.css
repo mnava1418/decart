@@ -1,0 +1,25 @@
+.myNavBar-main {
+    height: var(--navBar-height);
+    background-color: var(--secondary-color);
+    position: fixed;
+    right: 0;
+    left: 0;
+    z-index: 1030;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;    
+}
+
+.myNavBar-logo {
+    width: 50%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;       
+}
+
+.myNavBar-logo h3 {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+}
