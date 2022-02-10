@@ -1,7 +1,7 @@
 :root {
-  --primary-color: #A1A7C8;
-  --secondary-color: #6B9FED;
-  --alternative-color: #24F9F9;
+  --primary-color: #DBD8E3;
+  --secondary-color: #2A2438;
+  --alternative-color: #5C5470;
   --contrast-color: #FFFFFF;
   --navBar-height: 64px;
 }
@@ -24,7 +24,7 @@
 }
 
 .btn-primary {
-  background-color: var(--primary-color) !important;
-  border-color: var(--primary-color) !important;
+  background-color: var(--alternative-color) !important;
+  border-color: var(--alternative-color) !important;
   color: var(--contrast-color) !important;  
 }
