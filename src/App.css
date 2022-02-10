@@ -14,7 +14,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  font-size: calc(10px + 2vmin);
+  font-size: calc(10px + 1vmin);
   color: var(--contrast-color);
 }
 
@@ -27,4 +27,8 @@
   background-color: var(--alternative-color) !important;
   border-color: var(--alternative-color) !important;
   color: var(--contrast-color) !important;  
+}
+
+main {
+  margin-top: var(--navBar-height);
 }
