@@ -1,9 +1,13 @@
-import { configureStore } from '@reduxjs/toolkit'
+import { configureStore, getDefaultMiddleware } from '@reduxjs/toolkit'
 import ethReducer from './slices/ethSlice'
+import statusReducer from './slices/statusSlice'
 
 export default configureStore({
     reducer: {
-        eth: ethReducer
+        eth: ethReducer,
+        status: statusReducer
     },
-    devTools: process.env.NODE_ENV !== 'production'
+    middleware: getDefaultMiddleware({
+        serializableCheck: false
+    })
 })
