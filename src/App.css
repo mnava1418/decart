@@ -15,7 +15,7 @@
   align-items: center;
   justify-content: flex-start;
   font-size: calc(10px + 1vmin);
-  color: var(--contrast-color);
+  color: var(--secondary-color);
 }
 
 /**Generic components**/

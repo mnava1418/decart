@@ -21,6 +21,7 @@
 
 .myNavBar-logo {
     width: 40%;    
+    color: var(--contrast-color)
 }
 
 .myNavBar-logo h3 {
@@ -39,6 +40,7 @@
 .myNavBar-links i {
     font-size: 1.3rem;
     margin-left: 8px;    
+    color: var(--contrast-color);
 }
 
 .myNavBar-links i:hover {
