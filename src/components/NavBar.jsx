@@ -4,7 +4,7 @@ import { Button } from 'react-bootstrap';
 import logo from '../img/decartLogoWhite.png'
 import '../styles/NavBar.css'
 
-function NavBar({isMetamask}) {
+function NavBar({isWallet}) {
   const getConnectBtn = () => {
     return(
       <div className='myNavBar-links'>
@@ -25,7 +25,7 @@ function NavBar({isMetamask}) {
             <i className="bi bi-person-fill"></i>
             <i className="bi bi-plus-circle-fill"></i>
           </div>
-          {isMetamask ? getConnectBtn() : <></>}
+          {isWallet ? getConnectBtn() : <></>}
         </div>        
       </div>
   );

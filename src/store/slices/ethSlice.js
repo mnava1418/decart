@@ -1,8 +1,9 @@
 import { createSlice } from '@reduxjs/toolkit'
 
 const INITIAL_STATE = {
-    web3: null,
-    account: null,
+    web3: undefined,
+    account: undefined,
+    usersContract: undefined,
 }
 
 export const ethSlice = createSlice({
@@ -15,13 +16,18 @@ export const ethSlice = createSlice({
 
         setAccount: (state, action) => {
             state.account = action.payload
+        },
+
+        loadUsersContract: (state, action) => {
+            state.usersContract = action.payload
         }
     }
 })
 
 export const {
     loadWeb3,
-    setAccount
+    setAccount,
+    loadUsersContract
 } = ethSlice.actions
 
 //Selectors
