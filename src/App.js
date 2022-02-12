@@ -6,21 +6,24 @@ import { isConnectedSelector } from './store/slices/statusSlice';
 import Home from './components/home/Home';
 import Main from './components/main/Main';
 import { detectETHWallet } from './services/ethService';
+import useDapp from './hooks/useLoadDapp';
 
 import './App.css';
 
 function App() {
   const [showAlert, setShowAlert] = useState({show: false, text: '', link: '', linkText: ''})
   const isConnected = useSelector(isConnectedSelector)  
-  const dispatch = useDispatch()
+  const {account, dappLoaded, usersContract} = useDapp()
+
+  const dispatch = useDispatch()  
   
   useEffect(() => {
     detectETHWallet(setShowAlert, dispatch)
   }, [dispatch, isConnected])
 
   const loadApp = () => {
-    if(isConnected) {
-      return(<Main />)
+    if(isConnected && dappLoaded) {
+      return(<Main account={account} usersContract={usersContract} />)
     } else {
       return(<Home />)
     }

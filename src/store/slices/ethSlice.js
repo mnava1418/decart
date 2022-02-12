@@ -3,7 +3,7 @@ import { createSlice } from '@reduxjs/toolkit'
 const INITIAL_STATE = {
     web3: undefined,
     account: undefined,
-    usersContract: undefined,
+    usersContract: undefined,    
 }
 
 export const ethSlice = createSlice({
@@ -14,23 +14,27 @@ export const ethSlice = createSlice({
             state.web3 = action.payload
         },
 
-        setAccount: (state, action) => {
-            state.account = action.payload
-        },
-
-        loadUsersContract: (state, action) => {
-            state.usersContract = action.payload
-        }
+        loadDappInfo: (state, action) => {
+            state.account = action.payload.account
+            state.usersContract = action.payload.usersContract
+        }        
     }
 })
 
 export const {
-    loadWeb3,
-    setAccount,
-    loadUsersContract
+    loadWeb3,   
+    loadDappInfo 
 } = ethSlice.actions
 
 //Selectors
 export const accountSelector = (state) => state.eth.account
+
+export const usersContractSelector = (state) => state.eth.usersContract
+
+export const dappLoadedSelector = (state) => {
+    const {account, usersContract} = state.eth
+    return (account !== undefined && usersContract !== undefined)
+}
+
 
 export default ethSlice.reducer

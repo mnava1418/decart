@@ -1,6 +1,6 @@
 import Web3 from 'web3/dist/web3.min'
 import UsersContract from '../abis/Users.json'
-import { loadWeb3, setAccount, loadUsersContract } from '../store/slices/ethSlice'
+import { loadWeb3, loadDappInfo } from '../store/slices/ethSlice'
 import { setIsConnected } from '../store/slices/statusSlice'
 
 export const detectETHWallet = (setShowAlert, dispatch) => {    
@@ -15,7 +15,7 @@ export const detectETHWallet = (setShowAlert, dispatch) => {
 const loadDappData = async (setShowAlert, dispatch) => {
     const web3 = getWeb3(dispatch)
     const account = await getAccount(web3, dispatch)
-    const users = await loadContract(web3, UsersContract, loadUsersContract, dispatch)
+    const users = await loadContract(web3, UsersContract)
 
     if(!users) {
         setShowAlert({show: true, link: '', linkText: '', text: 'Los contratos no están disponibles. Favor de seleccionar otra red.'})
@@ -23,6 +23,7 @@ const loadDappData = async (setShowAlert, dispatch) => {
     
     if(users && account) {
         dispatch(setIsConnected(true))
+        dispatch(loadDappInfo({account, usersContract: users}))
     } else {
         dispatch(setIsConnected(false))
     }
@@ -37,15 +38,14 @@ const getWeb3 = (dispatch) => {
 const getAccount = async (web3, dispatch) => {    
     const accounts = await web3.eth.getAccounts()
     
-    if(accounts.length > 0) {
-        dispatch(setAccount(accounts[0]))
+    if(accounts.length > 0) {        
         return accounts[0]
     } else {
         return undefined
     }
 }
 
-const loadContract = async (web3, contractDef, loadAction, dispatch) => {
+const loadContract = async (web3, contractDef) => {
     const networkId = await web3.eth.net.getId()
     const networks = contractDef.networks
 
@@ -54,8 +54,7 @@ const loadContract = async (web3, contractDef, loadAction, dispatch) => {
     } else {
         const address = networks[networkId].address
         const abi = contractDef.abi
-        const contract = new web3.eth.Contract(abi, address)
-        dispatch(loadAction(contract))
+        const contract = new web3.eth.Contract(abi, address)        
         return contract
     }
 }
