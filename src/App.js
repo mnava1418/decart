@@ -2,8 +2,7 @@ import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { displayAlert } from './components/helpers';
 import NavBar from './components/NavBar';
-import { currentPageSelector } from './store/slices/statusSlice';
-import { APP_PAGES } from './config'
+import { isConnectedSelector } from './store/slices/statusSlice';
 import Home from './components/home/Home';
 import Main from './components/main/Main';
 import { detectETHWallet } from './services/ethService';
@@ -11,32 +10,28 @@ import { detectETHWallet } from './services/ethService';
 import './App.css';
 
 function App() {
-  const [isWallet, setIsWallet] = useState(false)
   const [showAlert, setShowAlert] = useState({show: false, text: '', link: '', linkText: ''})
-  const currentPage = useSelector(currentPageSelector) 
+  const isConnected = useSelector(isConnectedSelector)  
   const dispatch = useDispatch()
   
-  useEffect(() => {            
-    detectETHWallet(setIsWallet, setShowAlert, dispatch)
-  }, [dispatch])
+  useEffect(() => {
+    detectETHWallet(setShowAlert, dispatch)
+  }, [dispatch, isConnected])
 
-  const getCurrentPage = () => {
-      switch (currentPage) {
-        case APP_PAGES.HOME:
-          return(<Home />)
-        case APP_PAGES.MAIN:
-          return(<Main />)
-        default:
-          return(<Main />);
-      }
+  const loadApp = () => {
+    if(isConnected) {
+      return(<Main />)
+    } else {
+      return(<Home />)
+    }
   }
   
   return (
     <div className="App">
-      <NavBar isWallet={isWallet}/>
+      <NavBar />
       <main>
         {showAlert.show ? displayAlert('danger', showAlert.text, showAlert.link, showAlert.linkText) : <></>}
-        {getCurrentPage()}
+        {loadApp()}
       </main>
     </div>
   );

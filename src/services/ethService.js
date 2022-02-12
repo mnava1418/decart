@@ -1,14 +1,14 @@
 import Web3 from 'web3/dist/web3.min'
 import UsersContract from '../abis/Users.json'
 import { loadWeb3, setAccount, loadUsersContract } from '../store/slices/ethSlice'
+import { setIsConnected } from '../store/slices/statusSlice'
 
-export const detectETHWallet = (setIsWallet, setShowAlert, dispatch) => {    
-    if(window.ethereum) {
-        setIsWallet(true)
+export const detectETHWallet = (setShowAlert, dispatch) => {    
+    if(window.ethereum && window.ethereum.isMetaMask) {        
         loadDappData(setShowAlert, dispatch)
-    } else {
-        setIsWallet(false)
-        setShowAlert({show: true, link: 'https://metamask.io/download', linkText: 'MetaMask', text: 'Por favor descarga un wallet para ETH. Recomendamos '})
+    } else {        
+        dispatch(setIsConnected(false))
+        setShowAlert({show: true, link: 'https://metamask.io/download', linkText: 'MetaMask', text: 'Por favor descarga '})
     }
 }  
 
@@ -19,10 +19,12 @@ const loadDappData = async (setShowAlert, dispatch) => {
 
     if(!users) {
         setShowAlert({show: true, link: '', linkText: '', text: 'Los contratos no están disponibles. Favor de seleccionar otra red.'})
-    } else if(account) {
-        console.log('Estamos conectados')
+    } 
+    
+    if(users && account) {
+        dispatch(setIsConnected(true))
     } else {
-        console.log('Estamos desconectados')
+        dispatch(setIsConnected(false))
     }
 }
 
@@ -32,7 +34,7 @@ const getWeb3 = (dispatch) => {
     return web3
 }
 
-const getAccount = async (web3, dispatch) => {
+const getAccount = async (web3, dispatch) => {    
     const accounts = await web3.eth.getAccounts()
     
     if(accounts.length > 0) {

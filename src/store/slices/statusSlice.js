@@ -2,7 +2,8 @@ import { createSlice } from '@reduxjs/toolkit'
 import { APP_PAGES } from '../../config'
 
 const INITIAL_STATE = {
-    currentPage: APP_PAGES.HOME
+    currentPage: APP_PAGES.HOME,
+    isConnected: false
 }
 
 export const statusSlice = createSlice({
@@ -11,15 +12,22 @@ export const statusSlice = createSlice({
     reducers: {        
         setCurrentPage: (state, action) => {
             state.currentPage = action.payload
+        },
+
+        setIsConnected: (state, action) => {
+            state.isConnected = action.payload
         }
     }
 })
 
 export const {
-    setCurrentPage
+    setCurrentPage,
+    setIsConnected
 } = statusSlice.actions
 
 //Selectors
 export const currentPageSelector = (state) => state.status.currentPage
+
+export const isConnectedSelector = (state) => state.status.isConnected
 
 export default statusSlice.reducer
