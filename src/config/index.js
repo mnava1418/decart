@@ -1,4 +1,5 @@
 export const APP_PAGES = {
-    HOME: 1,
-    MAIN: 2
+    LOADING: 1,    
+    REGISTER: 2,    
+    MAIN:3
 }

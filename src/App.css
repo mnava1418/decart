@@ -4,6 +4,8 @@
   --alternative-color: #5C5470;
   --contrast-color: #FFFFFF;
   --navBar-height: 64px;
+  --main-top: 24px;
+  --fill-bottom: 48px;
 }
 
 .App {
@@ -18,7 +20,7 @@
   color: var(--secondary-color);
 }
 
-/**Generic components**/
+/**START Generic components**/
 .btn {
   font-weight: 500 !important;
 }
@@ -29,6 +31,27 @@
   color: var(--contrast-color) !important;  
 }
 
+.spinner-grow {
+  width: 3rem !important;
+  height: 3rem !important;
+}
+
+.bg-image {
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.bg-image-cover {
+  background-size: cover;
+}
+
+/**END Generic components**/
+
 main {
-  margin-top: var(--navBar-height);
+  margin-top: calc(var(--navBar-height) + var(--main-top));  
+}
+
+.fill-view {
+  min-height: calc(100vh - var(--navBar-height) - var(--fill-bottom));  
+  width: 100%;
 }

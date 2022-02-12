@@ -3,10 +3,11 @@ import { useDispatch, useSelector } from 'react-redux';
 import { displayAlert } from './components/helpers';
 import NavBar from './components/NavBar';
 import { isConnectedSelector } from './store/slices/statusSlice';
-import Home from './components/home/Home';
-import Main from './components/main/Main';
 import { detectETHWallet } from './services/ethService';
 import useDapp from './hooks/useLoadDapp';
+import Landing from './components/landing/Landing'
+import Home from './components/main/Home';
+
 
 import './App.css';
 
@@ -23,16 +24,16 @@ function App() {
 
   const loadApp = () => {
     if(isConnected && dappLoaded) {
-      return(<Main account={account} usersContract={usersContract} />)
+      return(<Home account={account} usersContract={usersContract} />)
     } else {
-      return(<Home />)
+      return(<Landing />)
     }
   }
   
   return (
     <div className="App">
       <NavBar />
-      <main>
+      <main className='fill-view'>
         {showAlert.show ? displayAlert('danger', showAlert.text, showAlert.link, showAlert.linkText) : <></>}
         {loadApp()}
       </main>

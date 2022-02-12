@@ -1,15 +1,8 @@
-import { useEffect } from 'react';
-import { getCurrentUser } from '../../services/usersService'
+import React from 'react'
 
-function Main({account, usersContract}) {
-    
-  useEffect( () => {
-    getCurrentUser(account, usersContract)
-    // eslint-disable-next-line
-  }, [])  
-  
+function Main() {
   return (
-    <div>Este va a ser el main</div>
+    <div>Main</div>
   )
 }
 
