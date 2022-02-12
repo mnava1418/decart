@@ -1,0 +1,61 @@
+.register-main {
+    width: 90%;
+    max-width: 1000px;
+    height: 600px;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    background-color: var(--contrast-color);
+    border-radius: 15px;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    overflow: auto;    
+    font-size: 1rem;
+}
+
+.register-image {
+    width: 0%;
+    height: 100%;    
+    background-image: url('../img/register.jpg');
+    position: relative;
+}
+
+.register-image::before {
+    content: "";
+    background-color: rgba(0, 0, 0, 0.2);
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}
+
+.register-form {
+    width: 100%;
+    height: 100%;    
+    padding: 40px;
+}
+
+.register-input {
+    border: 0 !important;
+    border-bottom: 3px solid var(--alternative-color) !important;
+    border-bottom-left-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+    color: var(--alternative-color) !important;
+    font-weight: 600 !important;
+    background-color: transparent !important;    
+}
+
+.register-input-no-norder {
+    border-bottom: 0px !important;
+}
+
+.register-input:focus {
+    box-shadow: none !important;
+}
+
+/*Medium devices (tablets, 768px and up)*/
+@media (min-width: 768px) { 
+    .register-image {width: 50%;}
+
+    .register-form {width: 50%;}
+}
