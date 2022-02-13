@@ -2,6 +2,7 @@ import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Button } from 'react-bootstrap';
 import { isConnectedSelector, setIsConnected } from '../store/slices/statusSlice';
+import { currentUserSelector } from '../store/slices/usersSlice';
 
 import logo from '../img/decartLogoWhite.png'
 import '../styles/NavBar.css'
@@ -9,6 +10,8 @@ import '../styles/NavBar.css'
 function NavBar() {  
 
   const isConnected = useSelector(isConnectedSelector)
+  const currentUser = useSelector(currentUserSelector)
+
   const dispatch = useDispatch()
 
   const handleConnection = async () => {
@@ -45,7 +48,7 @@ function NavBar() {
             <h3>Decart</h3>
         </div>  
         <div className='myNavBar-element'>
-          {isConnected ? getLinks() : <></>}
+          {isConnected && currentUser !== undefined ? getLinks() : <></>}
           {!isConnected ? getConnectBtn() : <></>}
         </div>        
       </div>
