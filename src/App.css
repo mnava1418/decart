@@ -55,3 +55,13 @@ main {
   min-height: calc(100vh - var(--navBar-height) - var(--fill-bottom));  
   width: 100%;
 }
+
+/**Profile IMG**/
+.profile-img {
+  width: 150px;
+  height: 150px;
+  background-color: var(--primary-color);  
+  border-radius: 50%;  
+  font-size: 4rem;  
+  cursor: pointer;
+}

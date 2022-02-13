@@ -1,7 +1,6 @@
 import {useState} from 'react'
 import { Form, Button,InputGroup, Spinner } from 'react-bootstrap'
 
-import logo from '../../img/decartLogo.png'
 import '../../styles/Register.css'
 
 function Register() {
@@ -12,22 +11,37 @@ function Register() {
         const form = document.getElementById('registerForm')
 
         if(form.checkValidity()) {
-            console.log('Vamos a crear')
             setIsProcessing(true)
 
         } else {
             setValidated(true)
         }
     }
+
+    const loadProfilePic = () => {
+        document.getElementById('profileIcon').classList.remove('d-flex')
+        document.getElementById('profileIcon').style.display = 'none'
+
+        const profilePic = document.getElementById('profileFile').files[0]
+        const reader = new FileReader()
+
+        reader.onloadend = () => {
+            document.getElementById('profileImg').style.backgroundImage = `url(${reader.result})`
+        }
+
+        if(profilePic) {
+            reader.readAsDataURL(profilePic)
+        }
+    }    
     
     return (
         <div className='register-main'>
             <div className='bg-image bg-image-cover register-image'></div>
-            <div className='register-form'>
-                <div>
-                    <img src={logo} alt='Decart' width={56} height={56}/>
-                    <h3>Decart</h3>
-                </div>  
+            <div className='register-form d-flex flex-column justify-content-center align-items-center'>                
+                <div id='profileImg' className='profile-img bg-image bg-image-cover d-flex flex-column justify-content-center align-items-center' onClick={() => {document.getElementById('profileFile').click()}}>
+                    <i id="profileIcon" className="bi bi-camera-fill d-flex flex-column justify-content-center align-items-center"><span style={{fontSize: '0.9rem', fontWeight: 'bold'}}>150x150 px</span></i>                        
+                </div>                                                    
+                <Form.Control id="profileFile" type="file" accept="image/*" hidden onChange={loadProfilePic}/>
                 <Form id="registerForm" noValidate validated={validated}>
                     <Form.Group className="mb-3" controlId="formName" style={{marginTop: '40px'}}>
                         <Form.Control required type="text" className='register-input' placeholder='Nombre' />
