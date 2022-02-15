@@ -1,6 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit'
 
 const INITIAL_STATE = {
+    isRegisterUser: false, //flag for the first time a user is created. No used for other purposes
     currentUser: undefined
 }
 
@@ -10,15 +11,22 @@ export const usersSlice = createSlice({
     reducers: {
         loadCurrentUser: (state, action) => {
             state.currentUser = action.payload
-        }       
+        },
+        
+        setIsRegisterUser: (state, action) => {
+            state.isRegisterUser = action.payload
+        }
     }
 })
 
 export const {    
-    loadCurrentUser
+    loadCurrentUser,
+    setIsRegisterUser
 } = usersSlice.actions
 
 //Selectors
 export const currentUserSelector = (state) => state.users.currentUser
+
+export const isRegisterUserSelector = (state) => state.users.isRegisterUser
 
 export default usersSlice.reducer
