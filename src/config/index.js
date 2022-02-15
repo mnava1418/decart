@@ -3,3 +3,9 @@ export const APP_PAGES = {
     REGISTER: 2,    
     MAIN:3
 }
+
+export const COINBASE_URL = 'https://api.coinbase.com'
+
+export const REGISTRATION_COST = 10 //in USD
+
+export const CONTACT_EMAIL = 'martin@mnavapena.com'
