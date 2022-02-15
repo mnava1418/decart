@@ -31,6 +31,8 @@ export const accountSelector = (state) => state.eth.account
 
 export const usersContractSelector = (state) => state.eth.usersContract
 
+export const web3Selector = (state) => state.eth.web3
+
 export const dappLoadedSelector = (state) => {
     const {account, usersContract} = state.eth
     return (account !== undefined && usersContract !== undefined)
