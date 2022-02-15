@@ -2,6 +2,9 @@ import Web3 from 'web3/dist/web3.min'
 import UsersContract from '../abis/Users.json'
 import { loadWeb3, loadDappInfo } from '../store/slices/ethSlice'
 import { setIsConnected } from '../store/slices/statusSlice'
+import { setIsRegisterUser } from '../store/slices/usersSlice'
+import { get } from './networkService'
+import { COINBASE_URL } from '../config'
 
 export const detectETHWallet = (setShowAlert, dispatch) => {    
     if(window.ethereum && window.ethereum.isMetaMask) {        
@@ -24,6 +27,7 @@ const loadDappData = async (setShowAlert, dispatch) => {
     if(users && account) {
         dispatch(setIsConnected(true))
         dispatch(loadDappInfo({account, usersContract: users}))
+        subscribeToEvents(users, account, dispatch)
     } else {
         dispatch(setIsConnected(false))
     }
@@ -57,4 +61,24 @@ const loadContract = async (web3, contractDef) => {
         const contract = new web3.eth.Contract(abi, address)        
         return contract
     }
+}
+
+export const getETHPrice = async () => {
+    const result = await get(COINBASE_URL, '/v2/prices/ETH-USD/spot', {})
+    let ethPrice = 0.0
+
+    if(result.status === 200) {
+        ethPrice =  parseFloat(result.data.data.amount)
+    }
+    
+    return ethPrice
+}
+
+const subscribeToEvents = (usersContract, account, dispatch) => {
+    usersContract.events.CreateUser()
+    .on('data', async (event) => {        
+        if(event.returnValues.userAddress === account) {
+            dispatch(setIsRegisterUser(true))
+        }
+    })
 }

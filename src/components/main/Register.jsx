@@ -1,21 +1,46 @@
 import {useState} from 'react'
 import { Form, Button,InputGroup, Spinner } from 'react-bootstrap'
+import { createUser, getRegistrationCost } from '../../services/usersService'
+import ConfirmModal from '../ConfirmModal'
+import { displayAlert } from '../helpers'
+import useLoadDapp from '../../hooks/useLoadDapp'
+import { REGISTRATION_COST } from '../../config'
 
 import '../../styles/Register.css'
 
 function Register() {
     const [validated, setValidated] = useState(false)
     const [isProcessing, setIsProcessing] = useState(false)
+    const [showModal, setShowModal] = useState(false)
+    const [showAlert, setShowAlert] = useState({show: false, type:'', text: ''})
+    const [cost, setCost] = useState(0.0)
+    const {web3, account, usersContract} = useLoadDapp()
 
-    const handleRegister = () => {
+    const handleRegister = async () => {
+        setShowAlert({...showAlert, show: false})
         const form = document.getElementById('registerForm')
 
         if(form.checkValidity()) {
-            setIsProcessing(true)
+            setIsProcessing(true)            
+            const registrationCost = await getRegistrationCost()
+
+            if(registrationCost > 0.0) {
+                setCost(registrationCost)
+                setShowModal(true)
+            } else {
+                setShowAlert({show: true, type: 'danger', text: 'Error al calcular el precio del ETH.'})
+                setIsProcessing(false)
+            }
 
         } else {
             setValidated(true)
         }
+    }
+
+    const handleContinue =() => {
+        const userInfo = getUserInfo()
+        createUser(web3, account, usersContract, userInfo, cost, setShowAlert, setIsProcessing)
+        setShowModal(false)
     }
 
     const loadProfilePic = () => {
@@ -33,6 +58,17 @@ function Register() {
             reader.readAsDataURL(profilePic)
         }
     }    
+
+    const getUserInfo = () => {
+        const userInfo = {
+            name: document.getElementById('formName').value,
+            email: document.getElementById('formEmail').value,
+            profilePic: 'temp',
+            cost: parseFloat(document.getElementById('formCost').value)
+        }
+
+        return userInfo
+    }
     
     return (
         <div className='register-main'>
@@ -59,13 +95,14 @@ function Register() {
                         <Form.Text  muted style={{fontSize: '0.9rem'}}>
                             *Pago único para que la gente te pueda seguir. Si la membresía es 0 eth, tu perfil será público.
                         </Form.Text>                        
-                    </Form.Group>                
+                    </Form.Group>         
+                    {showAlert.show ? displayAlert(showAlert.type, showAlert.text, '', '') : <></>}       
                     {isProcessing ? <Spinner animation="grow" style={{marginTop: '40px'}} /> : <Button variant='primary' style={{marginTop: '40px'}} onClick={handleRegister}>Registrarse</Button>}
                 </Form>
             </div>
+            <ConfirmModal show={showModal} title={'Registrar Usuario'} text={`Se te hará un único cargo de ${cost} ETH equivalente a ${REGISTRATION_COST} USD`} cancel={() => {setShowModal(false); setIsProcessing(false)}} confirm={handleContinue} />
         </div>
     )
 }
 
 export default Register
-       
