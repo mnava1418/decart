@@ -12,7 +12,8 @@ function Register() {
     const [validated, setValidated] = useState(false)
     const [isProcessing, setIsProcessing] = useState(false)
     const [showModal, setShowModal] = useState(false)
-    const [showAlert, setShowAlert] = useState({show: false, type:'', text: ''})
+    const [showAlert, setShowAlert] = useState({show: false, type:'', text: '', link: '', linkText: ''})
+
     const [cost, setCost] = useState(0.0)
     const {web3, account, usersContract} = useLoadDapp()
 
@@ -28,7 +29,7 @@ function Register() {
                 setCost(registrationCost)
                 setShowModal(true)
             } else {
-                setShowAlert({show: true, type: 'danger', text: 'Error al calcular el precio del ETH.'})
+                setShowAlert({show: true, type: 'danger', text: 'Error al calcular el precio del ETH.', link: '', linkText: ''})
                 setIsProcessing(false)
             }
 
@@ -96,7 +97,7 @@ function Register() {
                             *Pago único para que la gente te pueda seguir. Si la membresía es 0 eth, tu perfil será público.
                         </Form.Text>                        
                     </Form.Group>         
-                    {showAlert.show ? displayAlert(showAlert.type, showAlert.text, '', '') : <></>}       
+                    {showAlert.show ? displayAlert(showAlert.type, showAlert.text, showAlert.link, showAlert.linkText) : <></>}       
                     {isProcessing ? <Spinner animation="grow" style={{marginTop: '40px'}} /> : <Button variant='primary' style={{marginTop: '40px'}} onClick={handleRegister}>Registrarse</Button>}
                 </Form>
             </div>

@@ -26,9 +26,9 @@ export const createUser = async (web3, account, usersContract, userInfo, registr
         console.error(err)
 
         if(err.code !== 4001) {
-            setShowAlert({show: true, type: 'danger', text: `Error: Favor de contactarnos a ${CONTACT_EMAIL}`})
+            setShowAlert({show: true, type: 'danger', text: 'Error: Favor de contactarnos a ', link: `mailto:${CONTACT_EMAIL}`, linkText: `${CONTACT_EMAIL}`})
         }
-
+        
         setIsProcessing(false)
     });
 }
