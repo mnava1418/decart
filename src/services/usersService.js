@@ -24,7 +24,11 @@ export const createUser = async (web3, account, usersContract, userInfo, registr
     })
     .on('error', (err) => {
         console.error(err)
-        setShowAlert({show: true, type: 'danger', text: `Error: Favor de contactarnos a ${CONTACT_EMAIL}`})
+
+        if(err.code !== 4001) {
+            setShowAlert({show: true, type: 'danger', text: `Error: Favor de contactarnos a ${CONTACT_EMAIL}`})
+        }
+
         setIsProcessing(false)
     });
 }
@@ -33,7 +37,7 @@ export const getRegistrationCost = async() => {
     const ethPrice = await getETHPrice()
     
     if(ethPrice > 0.0) {
-        return REGISTRATION_COST / ethPrice
+        return (REGISTRATION_COST / ethPrice).toFixed(8)
     } else {
         return 0.0
     }
