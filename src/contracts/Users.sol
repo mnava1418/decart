@@ -14,7 +14,9 @@ contract Users {
     string profilePic;
     uint cost;
     address userAddress;
-    bool valid;    
+    uint followings;
+    uint followers;
+    bool valid;
   }
 
   /*---EVENTS---*/
@@ -23,7 +25,7 @@ contract Users {
     string email,
     string profilePic,
     uint cost,
-    address userAddress
+    address userAddress    
   );
 
   event FollowUser(
@@ -42,7 +44,7 @@ contract Users {
     require(bytes(_profilePic).length > 0, 'La foto de perfil es obligatoria');
 
     //Add user and pay the owner
-    users[msg.sender] = _User(_name, _email, _profilePic, _cost, msg.sender, true);
+    users[msg.sender] = _User(_name, _email, _profilePic, _cost, msg.sender, 0, 0, true);
     payable(ownerAccount).transfer(msg.value);
 
     emit CreateUser(_name, _email, _profilePic, _cost, msg.sender);
@@ -51,13 +53,21 @@ contract Users {
   function followUser(address _addressToFollow) public payable {
     require(_addressToFollow != address(0), 'Invalid user');
     require(users[_addressToFollow].valid, 'Usuario no existe');
+    require(users[msg.sender].valid, 'Usuario no existe');
 
     _User memory userToFollow = users[_addressToFollow];
+    _User memory currentUser = users[msg.sender];
 
     if(userToFollow.cost > 0) {
       require(userToFollow.cost == msg.value, 'Monto incorrecto');
       payable(_addressToFollow).transfer(msg.value);
-    }
+    }    
+
+    userToFollow.followers = userToFollow.followers + 1;
+    currentUser.followings = currentUser.followings + 1;
+
+    users[_addressToFollow] = userToFollow;
+    users[msg.sender] = currentUser;
 
     followings[msg.sender][_addressToFollow] = true;
     followers[_addressToFollow][msg.sender] = true;
@@ -68,6 +78,16 @@ contract Users {
   function unfollowUser(address _addressToUnfollow) public {
     require(_addressToUnfollow != address(0), 'Invalid user');
     require(users[_addressToUnfollow].valid, 'Usuario no existe');
+    require(users[msg.sender].valid, 'Usuario no existe');
+
+    _User memory userToUnFollow = users[_addressToUnfollow];
+    _User memory currentUser = users[msg.sender];
+
+    userToUnFollow.followers = userToUnFollow.followers - 1;
+    currentUser.followings = currentUser.followings - 1;
+
+    users[_addressToUnfollow] = userToUnFollow;
+    users[msg.sender] = currentUser;
 
     followings[msg.sender][_addressToUnfollow] = false;
     followers[_addressToUnfollow][msg.sender] = false;

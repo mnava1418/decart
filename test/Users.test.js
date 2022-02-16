@@ -39,7 +39,11 @@ contract('Users', ([deployer, premiumUser, freeUser, uncreatedUser, secondPremiu
                 createdUser.name.should.equal('name')
                 createdUser.email.should.equal('test@test.com')
                 createdUser.profilePic.should.equal('profilePic')
-                createdUser.cost.toString().should.equal(convertToETH(1))                
+                createdUser.cost.toString().should.equal(convertToETH(1))
+                createdUser.followers.toString().should.equal('0')
+                createdUser.followings.toString().should.equal('0')
+                createdUser.userAddress.should.equal(premiumUser)
+                createdUser.valid.should.equal(true)
             })
 
             it('validate payment to owner', async () => {
@@ -57,6 +61,7 @@ contract('Users', ([deployer, premiumUser, freeUser, uncreatedUser, secondPremiu
                 event.email.should.equal('test@test.com')
                 event.profilePic.should.equal('profilePic')
                 event.cost.toString().should.equal(convertToETH(1))
+                event.userAddress.should.equal(premiumUser)
             })    
         })
 
@@ -79,12 +84,18 @@ contract('Users', ([deployer, premiumUser, freeUser, uncreatedUser, secondPremiu
             describe('premium user', () => {
                 const premiumCost = convertToETH(0.5)
                 let originalPremiumBalance
+                let originalFollowers
+                let originalFollowings
                 let result
 
                 beforeEach(async () => {
                     await users.createUser('name', 'test@test.com', 'profilePic', premiumCost, {from: premiumUser, value: convertToETH(0.1)})
+                    await users.createUser('name', 'test@test.com', 'profilePic', convertToETH(0), {from: deployer, value: convertToETH(0.1)})
                     originalPremiumBalance = await eth.getBalance(premiumUser)
-                    result = await users.followUser(premiumUser, {from: deployer, value: premiumCost})
+                    originalFollowers = await users.users(premiumUser).then(user => user.followers.toString())
+                    originalFollowings = await users.users(deployer).then(user => user.followings.toString())
+                    
+                    result = await users.followUser(premiumUser, {from: deployer, value: premiumCost})                    
                 })
 
                 it('payment was made', async () => {
@@ -94,13 +105,21 @@ contract('Users', ([deployer, premiumUser, freeUser, uncreatedUser, secondPremiu
                 })
 
                 it('deployer follows premiumUser', async() => {
-                    const isFollowing = await users.followings(deployer, premiumUser)
+                    const isFollowing = await users.followings(deployer, premiumUser)                    
+                    const followings = await users.users(deployer).then(user => user.followings.toString())
+                    const difference = parseInt(followings) - parseInt(originalFollowings)
+                    
                     isFollowing.should.equal(true)
+                    difference.toString().should.equal('1')
                 })
 
                 it('premiumUser is followed by deployer', async () => {
                     const isFollowed = await users.followers(premiumUser, deployer)
+                    const followers = await users.users(premiumUser).then(user => user.followers.toString())
+                    const difference = parseInt(followers) - parseInt(originalFollowers)
+
                     isFollowed.should.equal(true)
+                    difference.toString().should.equal('1')
                 })
 
                 it('emit FollowUser event', () => {
@@ -114,11 +133,16 @@ contract('Users', ([deployer, premiumUser, freeUser, uncreatedUser, secondPremiu
             })
             describe('free user', () => {
                 let originalFreeBalance
+                let originalFollowers
+                let originalFollowings
                 let result
 
                 beforeEach(async () => {
                     await users.createUser('name', 'test@test.com', 'profilePic', convertToETH(0), {from: freeUser, value: convertToETH(0.1)})
+                    await users.createUser('name', 'test@test.com', 'profilePic', convertToETH(0), {from: deployer, value: convertToETH(0.1)})
                     originalFreeBalance = await eth.getBalance(freeUser)
+                    originalFollowers = await users.users(premiumUser).then(user => user.followers.toString())
+                    originalFollowings = await users.users(deployer).then(user => user.followings.toString())
                     result = await users.followUser(freeUser, {from: deployer})
                 })
 
@@ -129,12 +153,20 @@ contract('Users', ([deployer, premiumUser, freeUser, uncreatedUser, secondPremiu
 
                 it('deployer follows freeUser', async() => {
                     const isFollowing = await users.followings(deployer, freeUser)
+                    const followings = await users.users(deployer).then(user => user.followings.toString())
+                    const difference = parseInt(followings) - parseInt(originalFollowings)
+                    
                     isFollowing.should.equal(true)
+                    difference.toString().should.equal('1')
                 })
 
                 it('freeUser is followed by deployer', async () => {
                     const isFollowed = await users.followers(freeUser, deployer)
+                    const followers = await users.users(freeUser).then(user => user.followers.toString())
+                    const difference = parseInt(followers) - parseInt(originalFollowers)
+
                     isFollowed.should.equal(true)
+                    difference.toString().should.equal('1')
                 })
 
                 it('emit FollowUser event', () => {
@@ -156,10 +188,19 @@ contract('Users', ([deployer, premiumUser, freeUser, uncreatedUser, secondPremiu
                 isFollowing.should.equal(false)                
             })
 
-            it('user not created', async () => {
+            it('user to follow not created', async () => {
                 await users.followUser(uncreatedUser, {from: deployer}).should.be.rejected
                 const isFollowed = await users.followers(uncreatedUser, deployer)
                 const isFollowing = await users.followings(deployer, uncreatedUser)
+                isFollowed.should.equal(false)
+                isFollowing.should.equal(false)                
+            })
+
+            it('user  not created', async () => {
+                await users.createUser('name', 'test@test.com', 'profilePic', convertToETH(0), {from: freeUser, value: convertToETH(0.1)})
+                await users.followUser(freeUser, {from: deployer}).should.be.rejected
+                const isFollowed = await users.followers(freeUser, deployer)
+                const isFollowing = await users.followings(deployer, freeUser)
                 isFollowed.should.equal(false)
                 isFollowing.should.equal(false)                
             })
@@ -184,32 +225,50 @@ contract('Users', ([deployer, premiumUser, freeUser, uncreatedUser, secondPremiu
         })
     })
     describe('unfollowUser', () => {
-        describe('success', () => {            
+        describe('success', () => { 
+            let originalFollowers
+            let originalFollowings
+            
             beforeEach(async () => {
-                await users.createUser('name', 'test@test.com', 'profilePic', convertToETH(0), {from: freeUser, value: convertToETH(0.1)})                
+                await users.createUser('name', 'test@test.com', 'profilePic', convertToETH(0), {from: freeUser, value: convertToETH(0.1)}) 
+                await users.createUser('name', 'test@test.com', 'profilePic', convertToETH(0), {from: deployer, value: convertToETH(0.1)}) 
+                originalFollowers = await users.users(freeUser).then(user => user.followers.toString())
+                originalFollowings = await users.users(deployer).then(user => user.followings.toString())               
                 await users.followUser(freeUser, {from: deployer})                
             })            
 
             it('deployer follows freeUser', async() => {
                 const isFollowing = await users.followings(deployer, freeUser)
+                const followings = await users.users(deployer).then(user => user.followings.toString())
+
                 isFollowing.should.equal(true)
+                followings.should.equal('1')
             })
 
             it('freeUser is followed by deployer', async () => {
                 const isFollowed = await users.followers(freeUser, deployer)
+                const followers = await users.users(freeUser).then(user => user.followers.toString())
+
                 isFollowed.should.equal(true)
+                followers.should.equal('1')
             })
 
             it('deployer unfollows freeUser', async() => {
                 await users.unfollowUser(freeUser, {from: deployer})
                 const isFollowing = await users.followings(deployer, freeUser)
+                const followings = await users.users(deployer).then(user => user.followings.toString())
+
                 isFollowing.should.equal(false)
+                originalFollowings.should.equal(followings)
             })
 
             it('freeUser is unfollowed by deployer', async () => {
                 await users.unfollowUser(freeUser, {from: deployer})
                 const isFollowed = await users.followers(freeUser, deployer)
+                const followers = await users.users(freeUser).then(user => user.followers.toString())
+
                 isFollowed.should.equal(false)
+                originalFollowers.should.equal(followers)
             })
         })
 
