@@ -15,12 +15,12 @@
     width: 50%;
     display: flex;
     flex-direction: row;
-    align-items: center;
-    justify-content: center;
+    align-items: center;    
 }
 
 .myNavBar-logo {
-    color: var(--contrast-color)
+    color: var(--contrast-color);
+    margin-left: 24px;    
 }
 
 .myNavBar-logo h3 {

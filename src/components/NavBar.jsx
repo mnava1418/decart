@@ -26,7 +26,7 @@ function NavBar() {
   const getConnectBtn = () => {
     return(
       <div className='myNavBar-links'>
-        <Button variant='primary' onClick={handleConnection}>Conectar</Button>
+        <Button variant='primary' onClick={handleConnection}><i class="bi bi-wallet"></i>&nbsp;&nbsp;&nbsp;Conectar</Button>
       </div>
     )
   }
@@ -43,11 +43,11 @@ function NavBar() {
 
   return (
       <div className='myNavBar-main'>
-        <div className='myNavBar-element myNavBar-logo'>
+        <div className='myNavBar-element myNavBar-logo justify-content-start'>
             <img src={logo} alt='Decart' width={56} height={56}/>
             <h3>Decart</h3>
         </div>  
-        <div className='myNavBar-element'>
+        <div className='myNavBar-element justify-content-end'>
           {isConnected && currentUser !== undefined ? getLinks() : <></>}
           {!isConnected ? getConnectBtn() : <></>}
         </div>        
