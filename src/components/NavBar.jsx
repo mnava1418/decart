@@ -26,7 +26,7 @@ function NavBar() {
   const getConnectBtn = () => {
     return(
       <div className='myNavBar-links'>
-        <Button variant='primary' onClick={handleConnection}><i class="bi bi-wallet"></i>&nbsp;&nbsp;&nbsp;Conectar</Button>
+        <Button variant='primary' onClick={handleConnection}><i className='bi bi-wallet'></i>&nbsp;&nbsp;&nbsp;Conectar</Button>
       </div>
     )
   }

@@ -8,6 +8,8 @@ import Register from './Register';
 import Main from './Main'
 import { Spinner } from 'react-bootstrap';
 
+import '../../styles/Main.css'
+
 function Home({account, usersContract}) {
   const currentPage = useSelector(currentPageSelector)
   const isRegisterUser = useSelector(isRegisterUserSelector)
