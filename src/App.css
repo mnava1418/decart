@@ -57,11 +57,14 @@ main {
 }
 
 /**Profile IMG**/
-.profile-img {
-  width: 150px;
-  height: 150px;
+.profile-img {  
   background-color: var(--primary-color);  
   border-radius: 50%;  
-  font-size: 4rem;  
+  font-size: 4rem;    
+}
+
+.profile-register {
+  width: 150px;
+  height: 150px;
   cursor: pointer;
 }

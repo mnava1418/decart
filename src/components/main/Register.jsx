@@ -75,7 +75,7 @@ function Register() {
         <div className='register-main'>
             <div className='bg-image bg-image-cover register-image'></div>
             <div className='register-form d-flex flex-column justify-content-center align-items-center'>                
-                <div id='profileImg' className='profile-img bg-image bg-image-cover d-flex flex-column justify-content-center align-items-center' onClick={() => {document.getElementById('profileFile').click()}}>
+                <div id='profileImg' className='profile-img profile-register bg-image bg-image-cover d-flex flex-column justify-content-center align-items-center' onClick={() => {document.getElementById('profileFile').click()}}>
                     <i id="profileIcon" className="bi bi-camera-fill d-flex flex-column justify-content-center align-items-center"><span style={{fontSize: '0.9rem', fontWeight: 'bold'}}>150x150 px</span></i>                        
                 </div>                                                    
                 <Form.Control id="profileFile" type="file" accept="image/*" hidden onChange={loadProfilePic}/>

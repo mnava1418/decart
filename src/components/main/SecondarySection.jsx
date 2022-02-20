@@ -1,10 +1,22 @@
-import { Card, Button } from 'react-bootstrap'
+import { useSelector } from 'react-redux'
+import { Card, Button, Spinner } from 'react-bootstrap'
 import UserProfile from './UserProfile'
+import { currentUserSelector } from '../../store/slices/usersSlice'
 
 function SecondarySection() {
-  return (
-    <div className='main-secondary-section'>
-        <UserProfile />
+  const currentUser = useSelector(currentUserSelector)
+
+  const getInfo = () => {
+    return (
+      <div className='main-secondary-section'>
+        <UserProfile 
+          name={currentUser.name}
+          address={currentUser.userAddress}
+          email={currentUser.email}
+          posts={currentUser.posts}
+          followers={currentUser.followers}
+          followings={currentUser.followers}
+        />
         <Card className='main-element' style={{ width: '18rem' }}>          
           <Card.Body>
             <Card.Title>Card Title</Card.Title>
@@ -26,6 +38,13 @@ function SecondarySection() {
           </Card.Body>
         </Card>
       </div>
+    )
+  }
+
+  return (
+    <>
+    {currentUser ? getInfo() : <Spinner animation="grow" /> }
+    </>
   )
 }
 
