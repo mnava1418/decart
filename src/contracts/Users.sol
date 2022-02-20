@@ -16,6 +16,7 @@ contract Users {
     address userAddress;
     uint followings;
     uint followers;
+    uint posts;
     bool valid;
   }
 
@@ -44,7 +45,7 @@ contract Users {
     require(bytes(_profilePic).length > 0, 'La foto de perfil es obligatoria');
 
     //Add user and pay the owner
-    users[msg.sender] = _User(_name, _email, _profilePic, _cost, msg.sender, 0, 0, true);
+    users[msg.sender] = _User(_name, _email, _profilePic, _cost, msg.sender, 0, 0, 0, true);
     payable(ownerAccount).transfer(msg.value);
 
     emit CreateUser(_name, _email, _profilePic, _cost, msg.sender);
