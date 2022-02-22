@@ -33,6 +33,13 @@ contract Users {
     address currentUser,
     address followedUser
   );
+
+  event UpdateUser(
+    string name,
+    string profilePic,
+    uint cost,
+    address userAddress
+  );
   
   constructor(address _ownerAccount) {
     ownerAccount = _ownerAccount;
@@ -49,6 +56,22 @@ contract Users {
     payable(ownerAccount).transfer(msg.value);
 
     emit CreateUser(_name, _email, _profilePic, _cost, msg.sender);
+  }
+
+  function updateUser(string memory _name, string memory _profilePic, uint _cost) public payable {
+    //Validate mandatory fields
+    require(bytes(_name).length > 0, 'El nombre es obligatorio');
+    require(bytes(_profilePic).length > 0, 'La foto de perfil es obligatoria');
+    require(users[msg.sender].valid, 'Usuario no existe');
+
+    _User memory currentUser = users[msg.sender];
+    currentUser.name = _name;
+    currentUser.profilePic = _profilePic;
+    currentUser.cost = _cost;
+
+    users[msg.sender] = currentUser;
+    
+    emit UpdateUser(_name, _profilePic, _cost, msg.sender);
   }
 
   function followUser(address _addressToFollow) public payable {

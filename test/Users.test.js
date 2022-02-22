@@ -282,4 +282,51 @@ contract('Users', ([deployer, premiumUser, freeUser, uncreatedUser, secondPremiu
             })           
         })
     })
+    describe('updateUser', () => {
+        describe('success', async () => {
+            let result
+                        
+            beforeEach(async () => {
+                await users.createUser('name', 'test@test.com', 'profilePic', convertToETH(0), {from: freeUser, value: convertToETH(0)})
+                result = await users.updateUser('newName', 'newPic', convertToETH(1), {from: freeUser})
+            })
+
+            it('user was updated', async () => {
+                const user = await users.users(freeUser)
+                user.name.should.equal('newName')
+                user.email.should.equal('test@test.com')
+                user.profilePic.should.equal('newPic')
+                user.cost.toString().should.equal(convertToETH(1))
+                user.followers.toString().should.equal('0')
+                user.followings.toString().should.equal('0')
+                user.userAddress.should.equal(freeUser)
+                user.valid.should.equal(true)
+            })           
+
+            it('emit UpdateUser event', () => {
+                const log = result.logs[0]
+                const event = log.args
+    
+                log.event.should.equal('UpdateUser')
+                event.name.should.equal('newName')
+                event.profilePic.should.equal('newPic')
+                event.cost.toString().should.equal(convertToETH(1))
+                event.userAddress.should.equal(freeUser)
+            })    
+        })
+
+        describe('failure', () => {
+            it('invalid name', async () => {
+                await users.updateUser('', 'profilePic', convertToETH(1), {from: premiumUser, value: convertToETH(0.1)}).should.be.rejected
+            })            
+
+            it('invalid profilePic', async () => {
+                await users.updateUser('name', '', convertToETH(1), {from: premiumUser, value: convertToETH(0.1)}).should.be.rejected
+            })
+
+            it('non existing user', async () => {
+                await users.updateUser('name', 'profilePic', convertToETH(1), {from: premiumUser, value: convertToETH(0.1)}).should.be.rejected
+            })
+        })
+    })
 })
