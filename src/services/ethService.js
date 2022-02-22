@@ -6,6 +6,8 @@ import { setIsRegisterUser } from '../store/slices/usersSlice'
 import { get } from './networkService'
 import { COINBASE_URL } from '../config'
 
+const DECIMALS = (10**18)
+
 export const detectETHWallet = (setShowAlert, dispatch) => {    
     if(window.ethereum && window.ethereum.isMetaMask) {        
         loadDappData(setShowAlert, dispatch)
@@ -81,4 +83,9 @@ const subscribeToEvents = (usersContract, account, dispatch) => {
             dispatch(setIsRegisterUser(true))
         }
     })
+}
+
+
+export const fromWei = (amount) => {
+    return (amount/DECIMALS)
 }

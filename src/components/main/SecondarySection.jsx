@@ -2,6 +2,8 @@ import { useSelector } from 'react-redux'
 import { Card, Button, Spinner } from 'react-bootstrap'
 import UserProfile from './UserProfile'
 import { currentUserSelector } from '../../store/slices/usersSlice'
+import { PROFILE_ACTIONS } from '../../config'
+import { fromWei } from '../../services/ethService'
 
 function SecondarySection() {
   const currentUser = useSelector(currentUserSelector)
@@ -13,9 +15,12 @@ function SecondarySection() {
           name={currentUser.name}
           address={currentUser.userAddress}
           email={currentUser.email}
-          posts={currentUser.posts}
-          followers={currentUser.followers}
-          followings={currentUser.followers}
+          posts={parseFloat(currentUser.posts)}
+          followers={parseFloat(currentUser.followers)}
+          followings={parseFloat(currentUser.followers)}
+          cost={fromWei(parseFloat(currentUser.cost))}
+          editable={true}
+          action={PROFILE_ACTIONS.UPDATE}        
         />
         <Card className='main-element' style={{ width: '18rem' }}>          
           <Card.Body>

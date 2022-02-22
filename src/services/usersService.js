@@ -20,16 +20,21 @@ export const createUser = async (web3, account, usersContract, userInfo, registr
     usersContract.methods.createUser(userInfo.name, userInfo.email, userInfo.profilePic, web3.utils.toWei(`${userInfo.cost}`, 'ether'))
     .send({from: account, value: web3.utils.toWei(`${registrationCost}`, 'ether')})
     .on('transactionHash', (hash) => {
-        setShowAlert({show: true, type: 'warning', text: 'La transacción está siendo procesada.'})
+        processOk(setShowAlert)
     })
     .on('error', (err) => {
-        console.error(err)
+       processError(err, setShowAlert, setIsProcessing)
+    });
+}
 
-        if(err.code !== 4001) {
-            setShowAlert({show: true, type: 'danger', text: 'Error: Favor de contactarnos a ', link: `mailto:${CONTACT_EMAIL}`, linkText: `${CONTACT_EMAIL}`})
-        }
-        
-        setIsProcessing(false)
+export const updateUser = (web3, account, usersContract, userInfo, setShowAlert, setIsProcessing) => {
+    usersContract.methods.updateUser(userInfo.name, userInfo.profilePic, web3.utils.toWei(`${userInfo.cost}`, 'ether'))
+    .send({from: account})
+    .on('transactionHash', (hash) => {
+        processOk(setShowAlert)
+    })
+    .on('error', (err) => {
+        processError(err, setShowAlert, setIsProcessing)
     });
 }
 
@@ -41,4 +46,18 @@ export const getRegistrationCost = async() => {
     } else {
         return 0.0
     }
+}
+
+const processOk = (setShowAlert) => {
+    setShowAlert({show: true, type: 'warning', text: 'La transacción está siendo procesada.'})
+}
+
+const processError = (err, setShowAlert, setIsProcessing) => {
+    console.error(err)
+
+    if(err.code !== 4001) {
+        setShowAlert({show: true, type: 'danger', text: 'Error: Favor de contactarnos a ', link: `mailto:${CONTACT_EMAIL}`, linkText: `${CONTACT_EMAIL}`})
+    }
+    
+    setIsProcessing(false)
 }

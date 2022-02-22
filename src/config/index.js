@@ -4,6 +4,10 @@ export const APP_PAGES = {
     MAIN:3
 }
 
+export const PROFILE_ACTIONS = {
+    UPDATE: 1,
+}
+
 export const COINBASE_URL = 'https://api.coinbase.com'
 
 export const REGISTRATION_COST = 10 //in USD
