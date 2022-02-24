@@ -2,6 +2,9 @@ import { setCurrentPage } from "../store/slices/statusSlice"
 import { APP_PAGES, REGISTRATION_COST, CONTACT_EMAIL } from "../config"
 import { getETHPrice } from './ethService'
 import { loadCurrentUser } from "../store/slices/usersSlice"
+import { create } from 'ipfs-http-client'
+import { ipfsData } from "../config"
+
 
 export const getCurrentUser = async (account, usersContract, dispatch) => {    
     const currentUser = await usersContract.methods.users(account).call()
@@ -60,4 +63,11 @@ const processError = (err, setShowAlert, setIsProcessing) => {
     }
     
     setIsProcessing(false)
+}
+
+export const uploadImg = async (data) => {    
+    const ipfs = create(ipfsData)
+    const result = await ipfs.add(data)
+
+    return result.path
 }

@@ -13,3 +13,9 @@ export const COINBASE_URL = 'https://api.coinbase.com'
 export const REGISTRATION_COST = 10 //in USD
 
 export const CONTACT_EMAIL = 'martin@mnavapena.com'
+
+export const ipfsData = {
+    host: 'ipfs.infura.io',
+    port: 5001,
+    protocol: 'https'
+}

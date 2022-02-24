@@ -4,15 +4,16 @@ import { PROFILE_ACTIONS } from '../../config'
 import { displayAlert } from '../helpers'
 import { updateUser } from '../../services/usersService'
 import useLoadDapp from '../../hooks/useLoadDapp'
+import { ipfsData } from '../../config'
 
-import logo from '../../img/logo.jpeg'
 import '../../styles/Profile.css'
 
-function UserProfile({name, address, email, posts, followings, followers, editable, action, cost}) {
+function UserProfile({name, address, email, posts, followings, followers, editable, action, cost, profilePic}) {
   const formatter = new Intl.NumberFormat('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 0})
 
   useEffect(() => {
-    document.getElementById('profileImg').style.backgroundImage = `url(${logo})`
+    document.getElementById('profileImg').style.backgroundImage = `url("${ipfsData.protocol}://${ipfsData.host}/ipfs/${profilePic}")`
+    // eslint-disable-next-line
   }, [])
 
   const [tooltipText, setToolTipText] = useState('Copiar al Portapapeles')

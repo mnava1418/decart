@@ -19,6 +19,7 @@ function SecondarySection() {
           followers={parseFloat(currentUser.followers)}
           followings={parseFloat(currentUser.followers)}
           cost={fromWei(parseFloat(currentUser.cost))}
+          profilePic={currentUser.profilePic}
           editable={true}
           action={PROFILE_ACTIONS.UPDATE}        
         />

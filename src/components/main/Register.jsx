@@ -1,10 +1,11 @@
 import {useState} from 'react'
 import { Form, Button,InputGroup, Spinner } from 'react-bootstrap'
-import { createUser, getRegistrationCost } from '../../services/usersService'
+import { createUser, getRegistrationCost, uploadImg } from '../../services/usersService'
 import ConfirmModal from '../ConfirmModal'
 import { displayAlert } from '../helpers'
 import useLoadDapp from '../../hooks/useLoadDapp'
 import { REGISTRATION_COST } from '../../config'
+import { Buffer } from 'buffer'
 
 import '../../styles/Register.css'
 
@@ -15,9 +16,10 @@ function Register() {
     const [showAlert, setShowAlert] = useState({show: false, type:'', text: '', link: '', linkText: ''})
 
     const [cost, setCost] = useState(0.0)
-    const {web3, account, usersContract} = useLoadDapp()
+    const [imgBuffer, setImgBuffer] = useState(undefined)
+    const {web3, account, usersContract} = useLoadDapp()    
 
-    const handleRegister = async () => {
+    const handleRegister = async () => {        
         setShowAlert({...showAlert, show: false})
         const form = document.getElementById('registerForm')
 
@@ -38,8 +40,8 @@ function Register() {
         }
     }
 
-    const handleContinue =() => {
-        const userInfo = getUserInfo()
+    const handleContinue = async () => {
+        const userInfo = await getUserInfo()
         createUser(web3, account, usersContract, userInfo, cost, setShowAlert, setIsProcessing)
         setShowModal(false)
     }
@@ -49,23 +51,44 @@ function Register() {
         document.getElementById('profileIcon').style.display = 'none'
 
         const profilePic = document.getElementById('profileFile').files[0]
+        readProfilePicAsURL(profilePic)
+        readProfilePicAsBuffer(profilePic)
+    }    
+
+    const readProfilePicAsURL = (profilePic) => {
         const reader = new FileReader()
 
         reader.onloadend = () => {
-            document.getElementById('profileImg').style.backgroundImage = `url(${reader.result})`
+            document.getElementById('profileImg').style.backgroundImage = `url(${reader.result})`            
         }
 
         if(profilePic) {
-            reader.readAsDataURL(profilePic)
+            reader.readAsDataURL(profilePic)            
         }
-    }    
+    }
 
-    const getUserInfo = () => {
+    const readProfilePicAsBuffer = (profilePic) => {
+        const reader = new FileReader()
+
+        reader.onloadend = () => {            
+            const buffer = Buffer.from(reader.result)
+            setImgBuffer(buffer)            
+        }
+
+        if(profilePic) {
+            reader.readAsArrayBuffer(profilePic)
+        }
+    }
+
+    const getUserInfo = async() => {
+        const profilePic = await uploadImg(imgBuffer)
+        //const profilePic = 'QmNmBvj2e7vjzgppVPfAiSmsH1KwaiUeNU2Hc3nX1w4Pgd'
+
         const userInfo = {
             name: document.getElementById('formName').value,
-            email: document.getElementById('formEmail').value,
-            profilePic: 'temp',
-            cost: parseFloat(document.getElementById('formCost').value)
+            email: document.getElementById('formEmail').value,            
+            cost: parseFloat(document.getElementById('formCost').value),
+            profilePic,
         }
 
         return userInfo
