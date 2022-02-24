@@ -7,21 +7,24 @@ import { fromWei } from '../../services/ethService'
 
 function SecondarySection() {
   const currentUser = useSelector(currentUserSelector)
+  
+  const getInfo = () => {    
+    const userInfo = {
+      name: currentUser.name,
+      address: currentUser.userAddress,
+      posts: parseFloat(currentUser.posts),
+      followers: parseFloat(currentUser.followers),
+      followings: parseFloat(currentUser.followings),
+      cost: fromWei(parseFloat(currentUser.cost)),
+      profilePic: currentUser.profilePic
+    }
 
-  const getInfo = () => {
     return (
       <div className='main-secondary-section'>
-        <UserProfile 
-          name={currentUser.name}
-          address={currentUser.userAddress}
-          email={currentUser.email}
-          posts={parseFloat(currentUser.posts)}
-          followers={parseFloat(currentUser.followers)}
-          followings={parseFloat(currentUser.followers)}
-          cost={fromWei(parseFloat(currentUser.cost))}
-          profilePic={currentUser.profilePic}
+        <UserProfile
+          userInfo={userInfo}
           editable={true}
-          action={PROFILE_ACTIONS.UPDATE}        
+          action={PROFILE_ACTIONS.UPDATE}          
         />
         <Card className='main-element' style={{ width: '18rem' }}>          
           <Card.Body>
