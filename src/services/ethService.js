@@ -1,10 +1,11 @@
 import Web3 from 'web3/dist/web3.min'
 import UsersContract from '../abis/Users.json'
 import { loadWeb3, loadDappInfo } from '../store/slices/ethSlice'
-import { setIsConnected } from '../store/slices/statusSlice'
+import { setIsConnected, setIsProcessing } from '../store/slices/statusSlice'
 import { setIsRegisterUser } from '../store/slices/usersSlice'
 import { get } from './networkService'
 import { COINBASE_URL } from '../config'
+import { getCurrentUser } from './usersService'
 
 const DECIMALS = (10**18)
 
@@ -81,6 +82,14 @@ const subscribeToEvents = (usersContract, account, dispatch) => {
     .on('data', async (event) => {        
         if(event.returnValues.userAddress === account) {
             dispatch(setIsRegisterUser(true))
+        }
+    })
+
+    usersContract.events.UpdateUser()
+    .on('data', async (event) => {
+        if(event.returnValues.userAddress === account) {                  
+            getCurrentUser(account, usersContract, dispatch)      
+            dispatch(setIsProcessing(false))      
         }
     })
 }
