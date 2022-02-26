@@ -1,10 +1,8 @@
 import { setCurrentPage } from "../store/slices/statusSlice"
-import { APP_PAGES, REGISTRATION_COST, CONTACT_EMAIL } from "../config"
+import { APP_PAGES, REGISTRATION_COST, CONTACT_EMAIL, ipfsData } from "../config"
 import { getETHPrice } from './ethService'
 import { loadCurrentUser } from "../store/slices/usersSlice"
 import { create } from 'ipfs-http-client'
-import { ipfsData } from "../config"
-
 
 export const getCurrentUser = async (account, usersContract, dispatch) => {    
     const currentUser = await usersContract.methods.users(account).call()
@@ -20,7 +18,11 @@ export const getCurrentUser = async (account, usersContract, dispatch) => {
 }
 
 export const createUser = async (web3, account, usersContract, userInfo, registrationCost, setShowAlert, setIsProcessing) => {    
-    usersContract.methods.createUser(userInfo.name, userInfo.email, userInfo.profilePic, web3.utils.toWei(`${userInfo.cost}`, 'ether'))
+    const profilePic = await uploadImg(userInfo.imgBuffer)
+
+    //const profilePic = 'QmNmBvj2e7vjzgppVPfAiSmsH1KwaiUeNU2Hc3nX1w4Pgd'
+ 
+    usersContract.methods.createUser(userInfo.name, userInfo.email, profilePic, web3.utils.toWei(`${userInfo.cost}`, 'ether'))
     .send({from: account, value: web3.utils.toWei(`${registrationCost}`, 'ether')})
     .on('transactionHash', (hash) => {
         processOk(setShowAlert)
@@ -30,14 +32,23 @@ export const createUser = async (web3, account, usersContract, userInfo, registr
     });
 }
 
-export const updateUser = (web3, account, usersContract, userInfo, setShowAlert, setIsProcessing) => {
+export const updateUser = (web3, account, usersContract, userInfo, setIsProcessing, setShowAlert, setComponentAlert, dispatch) => {
     usersContract.methods.updateUser(userInfo.name, userInfo.profilePic, web3.utils.toWei(`${userInfo.cost}`, 'ether'))
     .send({from: account})
     .on('transactionHash', (hash) => {
-        processOk(setShowAlert)
+        dispatch(setShowAlert(true))
+        setComponentAlert({type: 'warning', text: 'La transacción está siendo procesada.'})
     })
     .on('error', (err) => {
-        processError(err, setShowAlert, setIsProcessing)
+        console.error(err)
+
+        dispatch(setShowAlert(true))
+
+        if(err.code !== 4001) {
+            setComponentAlert({type: 'danger', text: 'Error: Favor de contactarnos a ', link: `mailto:${CONTACT_EMAIL}`, linkText: `${CONTACT_EMAIL}`})
+        }
+
+        dispatch(setIsProcessing(false))
     });
 }
 
@@ -65,7 +76,7 @@ const processError = (err, setShowAlert, setIsProcessing) => {
     setIsProcessing(false)
 }
 
-export const uploadImg = async (data) => {    
+const uploadImg = async (data) => {    
     const ipfs = create(ipfsData)
     const result = await ipfs.add(data)
 
