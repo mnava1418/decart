@@ -1,6 +1,6 @@
 import {useState} from 'react'
 import { Form, Button,InputGroup, Spinner } from 'react-bootstrap'
-import { createUser, getRegistrationCost, uploadImg } from '../../services/usersService'
+import { createUser, getRegistrationCost } from '../../services/usersService'
 import ConfirmModal from '../ConfirmModal'
 import { displayAlert } from '../helpers'
 import useLoadDapp from '../../hooks/useLoadDapp'
@@ -23,6 +23,11 @@ function Register() {
         setShowAlert({...showAlert, show: false})
         const form = document.getElementById('registerForm')
 
+        if(imgBuffer === undefined) {
+            setShowAlert({show: true, type: 'danger', text: 'La foto de perfil es obligatoria.', link: '', linkText: ''})
+            return
+        }
+
         if(form.checkValidity()) {
             setIsProcessing(true)            
             const registrationCost = await getRegistrationCost()
@@ -40,8 +45,8 @@ function Register() {
         }
     }
 
-    const handleContinue = async () => {
-        const userInfo = await getUserInfo()
+    const handleContinue = () => {
+        const userInfo = getUserInfo()
         createUser(web3, account, usersContract, userInfo, cost, setShowAlert, setIsProcessing)
         setShowModal(false)
     }
@@ -80,15 +85,12 @@ function Register() {
         }
     }
 
-    const getUserInfo = async() => {
-        const profilePic = await uploadImg(imgBuffer)
-        //const profilePic = 'QmNmBvj2e7vjzgppVPfAiSmsH1KwaiUeNU2Hc3nX1w4Pgd'
-
+    const getUserInfo = () => {
         const userInfo = {
             name: document.getElementById('formName').value,
             email: document.getElementById('formEmail').value,            
             cost: parseFloat(document.getElementById('formCost').value),
-            profilePic,
+            imgBuffer,
         }
 
         return userInfo
@@ -100,9 +102,9 @@ function Register() {
             <div className='register-form d-flex flex-column justify-content-center align-items-center'>                
                 <div id='profileImg' className='profile-img profile-register bg-image bg-image-cover d-flex flex-column justify-content-center align-items-center' onClick={() => {document.getElementById('profileFile').click()}}>
                     <i id="profileIcon" className="bi bi-camera-fill d-flex flex-column justify-content-center align-items-center"><span style={{fontSize: '0.9rem', fontWeight: 'bold'}}>150x150 px</span></i>                        
-                </div>                                                    
-                <Form.Control id="profileFile" type="file" accept="image/*" hidden onChange={loadProfilePic}/>
+                </div>      
                 <Form id="registerForm" noValidate validated={validated}>
+                <Form.Control required id="profileFile" type="file" accept="image/*" hidden onChange={loadProfilePic}/>
                     <Form.Group className="mb-3" controlId="formName" style={{marginTop: '40px'}}>
                         <Form.Control required type="text" className='register-input' placeholder='Nombre' />
                         <Form.Control.Feedback type="invalid">Campo obligatorio.</Form.Control.Feedback>
