@@ -1,10 +1,11 @@
 import { useSelector } from "react-redux"
-import { isProcessingSelector, setIsProcessing } from "../store/slices/statusSlice"
+import { isProcessingSelector, setIsProcessing, isAlertSelector, setIsAlert } from "../store/slices/statusSlice"
 
 function useStatus() {
     const isProcessing = useSelector(isProcessingSelector)
+    const isAlert = useSelector(isAlertSelector)
 
-    return {isProcessing, setIsProcessing}
+    return {isProcessing, setIsProcessing, isAlert, setIsAlert}
 }
 
 export default useStatus
