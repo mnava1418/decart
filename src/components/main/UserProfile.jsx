@@ -1,26 +1,31 @@
 import { useEffect, useState } from 'react'
+import { useDispatch } from 'react-redux'
 import { Card, Button, Tooltip, OverlayTrigger, Form, Spinner } from 'react-bootstrap'
-import { PROFILE_ACTIONS } from '../../config'
+import { PROFILE_ACTIONS, ipfsData } from '../../config'
 import { displayAlert } from '../helpers'
 import { updateUser } from '../../services/usersService'
 import useLoadDapp from '../../hooks/useLoadDapp'
-import { ipfsData } from '../../config'
+import useStatus from '../../hooks/useStatus'
+import { Buffer } from 'buffer'
 
 import '../../styles/Profile.css'
 
-function UserProfile({name, address, email, posts, followings, followers, editable, action, cost, profilePic}) {
+function UserProfile({userInfo, editable, action}) {
   const formatter = new Intl.NumberFormat('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 0})
-
+  const {name, address, posts, followings, followers, cost, profilePic} = userInfo
+  
   useEffect(() => {
-    document.getElementById('profileImg').style.backgroundImage = `url("${ipfsData.protocol}://${ipfsData.host}/ipfs/${profilePic}")`
-    // eslint-disable-next-line
-  }, [])
+    document.getElementById('profileImg').style.backgroundImage = `url("${ipfsData.protocol}://${ipfsData.host}/ipfs/${profilePic}")`    
+  }, [profilePic])
 
   const [tooltipText, setToolTipText] = useState('Copiar al Portapapeles')
   const [hasChange, setHasChange] = useState(false)
-  const [showAlert, setShowAlert] = useState({show: false, type:'', text: '', link: '', linkText: ''})
-  const [isProcessing, setIsProcessing] = useState(false)
+  const [imgBuffer, setImgBuffer] = useState(undefined)
+  const [componentAlert, setComponentAlert] = useState({type:'', text: '', link: '', linkText: ''})  
   const {web3, usersContract} = useLoadDapp()
+  
+  const dispatch = useDispatch()
+  const {isProcessing, setIsProcessing, isAlert, setIsAlert} = useStatus()
 
   const formatAddress = () => {
     return `${address.substring(0,5)}...${address.substring(address.length - 4, address.length)}`
@@ -76,26 +81,60 @@ function UserProfile({name, address, email, posts, followings, followers, editab
     }
   }
   
-  const handleUpdate = () => {    
-    setShowAlert({...showAlert, show: false})
-
+  const handleUpdate = () => {
+    dispatch(setIsAlert(false))
+    
     const updatedName = document.getElementById('profileName').value
     const updatedCost = document.getElementById('profileCost').value
 
     if(updatedName.trim() === '' || updatedCost.trim() === '') {
-      setShowAlert({show: true, type: 'danger', text: 'Campos obligatorios.', link: '', linkText: ''})
+      dispatch(setIsAlert(true))
+      setComponentAlert({type: 'danger', text: 'Campos obligatorios.', link: '', linkText: ''})
     } else {
-      setIsProcessing(true)
+      dispatch(setIsProcessing(true))      
       setHasChange(false)
-      updateUser(web3, address, usersContract, {name: updatedName, profilePic: 'nueva', cost: parseFloat(updatedCost)}, setShowAlert, setIsProcessing)
+      updateUser(web3, address, usersContract, {name: updatedName, profilePic, cost: parseFloat(updatedCost), imgBuffer}, setIsProcessing, setIsAlert, setComponentAlert, setImgBuffer, dispatch)
+    }
+  }
+
+  const loadProfilePic = () => {
+    const profileFile = document.getElementById('profileFile').files[0]
+    readProfilePicAsURL(profileFile)
+    readProfilePicAsBuffer(profileFile)
+    setHasChange(true)
+  }    
+
+  const readProfilePicAsURL = (profileFile) => {
+    const reader = new FileReader()
+
+    reader.onloadend = () => {
+        document.getElementById('profileImg').style.backgroundImage = `url(${reader.result})`            
+    }
+
+    if(profileFile) {
+        reader.readAsDataURL(profileFile)            
+    }
+  }
+
+  const readProfilePicAsBuffer = (profileFile) => {
+    const reader = new FileReader()
+
+    reader.onloadend = () => {            
+        const buffer = Buffer.from(reader.result)
+        setImgBuffer(buffer)            
+    }
+
+    if(profileFile) {
+        reader.readAsArrayBuffer(profileFile)
     }
   }
 
   return (
     <Card className='main-element' style={{ width: '18rem' }}>   
         <div className='bg-image bg-image-cover profile-card-background d-flex flex-column justify-content-center align-items-center'>
-          <div id='profileImg' className='bg-image bg-image-cover profile-img profile-card-img'/>
-        </div>
+          <div id='profileImg' className='bg-image bg-image-cover profile-img profile-card-img d-flex flex-column justify-content-center align-items-center' onClick={() => {document.getElementById('profileFile').click()}}/>
+        </div>  
+        <Form.Control required id="profileFile" type="file" accept="image/*" hidden onChange={loadProfilePic}/>
         <Card.Body style={{marginTop: '50px'}}>
         <Card.Title>
           <Form.Group controlId="profileName">
@@ -115,7 +154,7 @@ function UserProfile({name, address, email, posts, followings, followers, editab
           </Form.Group>
           <div>Membresía (ETH)</div>
         </div>        
-        {showAlert.show ? displayAlert(showAlert.type, showAlert.text, showAlert.link, showAlert.linkText) : <></>}
+        {isAlert ? displayAlert(componentAlert.type, componentAlert.text, componentAlert.link, componentAlert.linkText) : <></>}
         {isProcessing ? <Spinner animation='grow' /> : getMainButton()}
         </Card.Body>
     </Card>

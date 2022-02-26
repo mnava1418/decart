@@ -32,7 +32,12 @@ export const createUser = async (web3, account, usersContract, userInfo, registr
     });
 }
 
-export const updateUser = (web3, account, usersContract, userInfo, setIsProcessing, setShowAlert, setComponentAlert, dispatch) => {
+export const updateUser = async(web3, account, usersContract, userInfo, setIsProcessing, setShowAlert, setComponentAlert, setImgBuffer, dispatch) => {
+    if(userInfo.imgBuffer !== undefined) {
+        userInfo.profilePic = await uploadImg(userInfo.imgBuffer)
+        setImgBuffer(undefined)
+    }
+
     usersContract.methods.updateUser(userInfo.name, userInfo.profilePic, web3.utils.toWei(`${userInfo.cost}`, 'ether'))
     .send({from: account})
     .on('transactionHash', (hash) => {
@@ -42,9 +47,8 @@ export const updateUser = (web3, account, usersContract, userInfo, setIsProcessi
     .on('error', (err) => {
         console.error(err)
 
-        dispatch(setShowAlert(true))
-
         if(err.code !== 4001) {
+            dispatch(setShowAlert(true))
             setComponentAlert({type: 'danger', text: 'Error: Favor de contactarnos a ', link: `mailto:${CONTACT_EMAIL}`, linkText: `${CONTACT_EMAIL}`})
         }
 
