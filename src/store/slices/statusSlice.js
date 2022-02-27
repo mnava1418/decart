@@ -5,7 +5,13 @@ const INITIAL_STATE = {
     currentPage: APP_PAGES.LOADING,
     isConnected: false,
     isProcessing: false,
-    isAlert: false,
+    componentAlert: {
+        show: false, 
+        type:'', 
+        text: '', 
+        link: '', 
+        linkText: ''
+    }    
 }
 
 export const statusSlice = createSlice({
@@ -20,12 +26,12 @@ export const statusSlice = createSlice({
             state.isConnected = action.payload
         },
 
-        setIsProcessing: (state, action) => {
+        setIsProcessingGlobal: (state, action) => {
             state.isProcessing = action.payload
         },
 
-        setIsAlert: (state, action) => {
-            state.isAlert = action.payload
+        setComponentAlertGlobal: (state, action) => {
+            state.componentAlert = action.payload
         }
     }
 })
@@ -33,8 +39,8 @@ export const statusSlice = createSlice({
 export const {
     setCurrentPage,
     setIsConnected,
-    setIsProcessing,
-    setIsAlert
+    setIsProcessingGlobal,
+    setComponentAlertGlobal
 } = statusSlice.actions
 
 //Selectors
@@ -44,6 +50,6 @@ export const isConnectedSelector = (state) => state.status.isConnected
 
 export const isProcessingSelector = (state) => state.status.isProcessing
 
-export const isAlertSelector = (state) => state.status.isAlert
+export const componentAlertSelector = (state) => state.status.componentAlert
 
 export default statusSlice.reducer

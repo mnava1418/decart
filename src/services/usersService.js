@@ -1,4 +1,4 @@
-import { setCurrentPage } from "../store/slices/statusSlice"
+import { setCurrentPage, setComponentAlertGlobal, setIsProcessingGlobal } from "../store/slices/statusSlice"
 import { APP_PAGES, REGISTRATION_COST, CONTACT_EMAIL, ipfsData } from "../config"
 import { getETHPrice } from './ethService'
 import { loadCurrentUser } from "../store/slices/usersSlice"
@@ -32,7 +32,7 @@ export const createUser = async (web3, account, usersContract, userInfo, registr
     });
 }
 
-export const updateUser = async(web3, account, usersContract, userInfo, setIsProcessing, setShowAlert, setComponentAlert, setImgBuffer, dispatch) => {
+export const updateUser = async(web3, account, usersContract, userInfo, setImgBuffer, dispatch) => {
     if(userInfo.imgBuffer !== undefined) {
         userInfo.profilePic = await uploadImg(userInfo.imgBuffer)
         setImgBuffer(undefined)
@@ -40,19 +40,17 @@ export const updateUser = async(web3, account, usersContract, userInfo, setIsPro
 
     usersContract.methods.updateUser(userInfo.name, userInfo.profilePic, web3.utils.toWei(`${userInfo.cost}`, 'ether'))
     .send({from: account})
-    .on('transactionHash', (hash) => {
-        dispatch(setShowAlert(true))
-        setComponentAlert({type: 'warning', text: 'La transacción está siendo procesada.'})
+    .on('transactionHash', (hash) => {        
+        dispatch(setComponentAlertGlobal({show: true, type: 'warning', text: 'La transacción está siendo procesada.', link: '', linkText: ''}))        
     })
     .on('error', (err) => {
         console.error(err)
 
-        if(err.code !== 4001) {
-            dispatch(setShowAlert(true))
-            setComponentAlert({type: 'danger', text: 'Error: Favor de contactarnos a ', link: `mailto:${CONTACT_EMAIL}`, linkText: `${CONTACT_EMAIL}`})
+        if(err.code !== 4001) {            
+            dispatch(setComponentAlertGlobal({show: true, type: 'danger', text: 'Error: Favor de contactarnos a ', link: `mailto:${CONTACT_EMAIL}`, linkText: `${CONTACT_EMAIL}`}))
         }
 
-        dispatch(setIsProcessing(false))
+        dispatch(setIsProcessingGlobal(false))
     });
 }
 

@@ -7,6 +7,7 @@ import { updateUser } from '../../services/usersService'
 import useLoadDapp from '../../hooks/useLoadDapp'
 import useStatus from '../../hooks/useStatus'
 import { Buffer } from 'buffer'
+import { setIsProcessingGlobal, setComponentAlertGlobal } from '../../store/slices/statusSlice'
 
 import '../../styles/Profile.css'
 
@@ -21,11 +22,10 @@ function UserProfile({userInfo, editable, action}) {
   const [tooltipText, setToolTipText] = useState('Copiar al Portapapeles')
   const [hasChange, setHasChange] = useState(false)
   const [imgBuffer, setImgBuffer] = useState(undefined)
-  const [componentAlert, setComponentAlert] = useState({type:'', text: '', link: '', linkText: ''})  
   const {web3, usersContract} = useLoadDapp()
   
   const dispatch = useDispatch()
-  const {isProcessing, setIsProcessing, isAlert, setIsAlert} = useStatus()
+  const {isProcessing, componentAlert} = useStatus()
 
   const formatAddress = () => {
     return `${address.substring(0,5)}...${address.substring(address.length - 4, address.length)}`
@@ -81,19 +81,18 @@ function UserProfile({userInfo, editable, action}) {
     }
   }
   
-  const handleUpdate = () => {
-    dispatch(setIsAlert(false))
+  const handleUpdate = () => {    
+    dispatch(setComponentAlertGlobal({...componentAlert, show: false}))
     
     const updatedName = document.getElementById('profileName').value
     const updatedCost = document.getElementById('profileCost').value
 
-    if(updatedName.trim() === '' || updatedCost.trim() === '') {
-      dispatch(setIsAlert(true))
-      setComponentAlert({type: 'danger', text: 'Campos obligatorios.', link: '', linkText: ''})
+    if(updatedName.trim() === '' || updatedCost.trim() === '') {      
+      dispatch(setComponentAlertGlobal({show: true, type: 'danger', text: 'Campos obligatorios.', link: '', linkText: ''}))
     } else {
-      dispatch(setIsProcessing(true))      
+      dispatch(setIsProcessingGlobal(true))      
       setHasChange(false)
-      updateUser(web3, address, usersContract, {name: updatedName, profilePic, cost: parseFloat(updatedCost), imgBuffer}, setIsProcessing, setIsAlert, setComponentAlert, setImgBuffer, dispatch)
+      updateUser(web3, address, usersContract, {name: updatedName, profilePic, cost: parseFloat(updatedCost), imgBuffer}, setImgBuffer, dispatch)      
     }
   }
 
@@ -154,7 +153,7 @@ function UserProfile({userInfo, editable, action}) {
           </Form.Group>
           <div>Membresía (ETH)</div>
         </div>        
-        {isAlert ? displayAlert(componentAlert.type, componentAlert.text, componentAlert.link, componentAlert.linkText) : <></>}
+        {componentAlert.show ? displayAlert(componentAlert.type, componentAlert.text, componentAlert.link, componentAlert.linkText) : <></>}
         {isProcessing ? <Spinner animation='grow' /> : getMainButton()}
         </Card.Body>
     </Card>
