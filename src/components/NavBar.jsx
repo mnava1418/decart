@@ -42,7 +42,7 @@ function NavBar() {
   }
 
   return (
-      <div className='myNavBar-main'>
+      <nav className='myNavBar-main'>
         <div className='myNavBar-element myNavBar-logo justify-content-start'>
             <img src={logo} alt='Decart' width={56} height={56}/>
             <h3>Decart</h3>
@@ -51,7 +51,7 @@ function NavBar() {
           {isConnected && currentUser !== undefined ? getLinks() : <></>}
           {!isConnected ? getConnectBtn() : <></>}
         </div>        
-      </div>
+      </nav>
   );
 }
 
