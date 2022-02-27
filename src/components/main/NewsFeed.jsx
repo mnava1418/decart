@@ -1,4 +1,5 @@
 import { Card, Button } from 'react-bootstrap'
+import Search from './Search'
 
 function NewsFeed() {
 
@@ -29,6 +30,7 @@ function NewsFeed() {
 
     return (
         <div className='feed-container d-flex flex-column justify-content-start align-items-center'>
+            <Search />
             {getNewsFeedElements()}
         </div>
     )
