@@ -19,7 +19,7 @@ function App() {
   const dispatch = useDispatch()  
   
   useEffect(() => {
-    detectETHWallet(setShowAlert, dispatch)
+    detectETHWallet(isConnected, setShowAlert, dispatch)
   }, [dispatch, isConnected])
 
   const loadApp = () => {

@@ -5,20 +5,20 @@ import { setIsConnected, setIsProcessingGlobal, setComponentAlertGlobal } from '
 import { setIsRegisterUser } from '../store/slices/usersSlice'
 import { get } from './networkService'
 import { COINBASE_URL } from '../config'
-import { getCurrentUser } from './usersService'
+import { getCurrentUser, getAllUsers } from './usersService'
 
 const DECIMALS = (10**18)
 
-export const detectETHWallet = (setShowAlert, dispatch) => {    
+export const detectETHWallet = (isConnected, setShowAlert, dispatch) => {       
     if(window.ethereum && window.ethereum.isMetaMask) {        
-        loadDappData(setShowAlert, dispatch)
+        loadDappData(isConnected, setShowAlert, dispatch)
     } else {        
         dispatch(setIsConnected(false))
         setShowAlert({show: true, link: 'https://metamask.io/download', linkText: 'MetaMask', text: 'Por favor descarga '})
     }
 }  
 
-const loadDappData = async (setShowAlert, dispatch) => {
+const loadDappData = async (isConnected, setShowAlert, dispatch) => {
     const web3 = getWeb3(dispatch)
     const account = await getAccount(web3, dispatch)
     const users = await loadContract(web3, UsersContract)
@@ -29,8 +29,12 @@ const loadDappData = async (setShowAlert, dispatch) => {
     
     if(users && account) {
         dispatch(setIsConnected(true))
-        dispatch(loadDappInfo({account, usersContract: users}))
-        subscribeToEvents(users, account, dispatch)
+
+        if(isConnected) {
+            dispatch(loadDappInfo({account, usersContract: users}))
+            subscribeToEvents(users, account, dispatch)
+            getAllUsers(users, dispatch)
+        }
     } else {
         dispatch(setIsConnected(false))
     }
