@@ -1,7 +1,7 @@
 import { setCurrentPage, setComponentAlertGlobal, setIsProcessingGlobal } from "../store/slices/statusSlice"
 import { APP_PAGES, REGISTRATION_COST, CONTACT_EMAIL, ipfsData } from "../config"
 import { getETHPrice } from './ethService'
-import { loadCurrentUser } from "../store/slices/usersSlice"
+import { loadCurrentUser, setAllUsers } from "../store/slices/usersSlice"
 import { create } from 'ipfs-http-client'
 
 export const getCurrentUser = async (account, usersContract, dispatch) => {    
@@ -83,4 +83,17 @@ const uploadImg = async (data) => {
     const result = await ipfs.add(data)
 
     return result.path
+}
+
+export const getAllUsers = async(usersContract, dispatch) => {
+    const users = []
+    const createUserEvents = await usersContract.getPastEvents('CreateUser', {fromBlock: 0, toBlock: 'latest'})
+    const addressCollection = createUserEvents.map(event => event.returnValues.userAddress)
+
+    for (const address of addressCollection) {
+        const user = await usersContract.methods.users(address).call()        
+        users.push(user)        
+    }    
+    
+    dispatch(setAllUsers(users))
 }
