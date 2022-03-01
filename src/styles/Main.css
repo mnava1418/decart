@@ -47,6 +47,11 @@
     display: none;
 }
 
+.search-results {
+    width: 100%;
+    height: 100%;    
+}
+
 .search-pin {
     width: 16px;
     height: 16px;
