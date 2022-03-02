@@ -51,6 +51,9 @@ contract Users {
     require(bytes(_email).length > 0, 'El email es obligatorio');
     require(bytes(_profilePic).length > 0, 'La foto de perfil es obligatoria');
 
+    //Validate user doesn't exists
+    require(!users[msg.sender].valid, 'Usuario ya existe');
+
     //Add user and pay the owner
     users[msg.sender] = _User(_name, _email, _profilePic, _cost, msg.sender, 0, 0, 0, true);
     payable(ownerAccount).transfer(msg.value);
@@ -78,6 +81,8 @@ contract Users {
     require(_addressToFollow != address(0), 'Invalid user');
     require(users[_addressToFollow].valid, 'Usuario no existe');
     require(users[msg.sender].valid, 'Usuario no existe');
+
+    require(!followings[msg.sender][_addressToFollow], 'Duplicate following');
 
     _User memory userToFollow = users[_addressToFollow];
     _User memory currentUser = users[msg.sender];
