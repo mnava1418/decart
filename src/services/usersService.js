@@ -94,6 +94,8 @@ export const getAllUsers = async(usersContract, dispatch) => {
         const user = await usersContract.methods.users(address).call()        
         users.push(user)        
     }    
+
+    users.sort((a,b) => parseFloat(b.followers) - parseFloat(a.followers))
     
     dispatch(setAllUsers(users))
 }
