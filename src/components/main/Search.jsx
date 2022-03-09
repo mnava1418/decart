@@ -3,6 +3,8 @@ import {Form, InputGroup} from 'react-bootstrap'
 import RecentSearch from './RecentSearch'
 import SearchResults from './SearchResults'
 
+import '../../styles/Search.css'
+
 function Search() {
     const [searchText, setSearchText] = useState('')
 
