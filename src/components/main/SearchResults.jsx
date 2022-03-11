@@ -33,7 +33,7 @@ function SearchResults({searchText}) {
 
       return (
         <>
-          {filteredUsers.map((user, index) => {
+          {filteredUsers.slice(0,10).map((user, index) => {
             return(
               <div key={index} className='search-element d-flex flex-row justify-content-start align-items-center'>
                 <div className='bg-image bg-image-cover search-icon'>
