@@ -5,7 +5,7 @@ import { allUsersSelector } from '../../store/slices/usersSlice';
 import { fromWei } from '../../services/ethService';
 import { ipfsData } from '../../config';
 
-function SearchResults({searchText}) {
+function SearchResults({searchText, selectUser}) {
 
   const [isSearching, setIsSearching] = useState(true)
   const [filteredUsers, setFilteredUsers] = useState([])
@@ -41,7 +41,7 @@ function SearchResults({searchText}) {
         <>
           {filteredUsers.slice(0,10).map((user, index) => {
             return(
-              <div key={index} className='search-element d-flex flex-row justify-content-start align-items-center'>
+              <div key={index} className='search-element d-flex flex-row justify-content-start align-items-center' onClick={() => {selectUser(user)}}>
                 <div className='bg-image bg-image-cover search-icon'>
                   <img alt={user.name} src={`${ipfsData.protocol}://${ipfsData.host}/ipfs/${user.profilePic}`}/>
                 </div>
