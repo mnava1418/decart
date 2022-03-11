@@ -22,22 +22,28 @@ function SearchResults({searchText}) {
       setFilteredUsers(users)
       setIsSearching(false)
     }
+    // eslint-disable-next-line
   }, [searchText])
     
   const displayUsers = () => {
+    const searchResults = document.getElementById('searchResults')
+    searchResults.classList.remove('justify-content-center')
+    searchResults.classList.remove('justify-content-start')
+
     if(filteredUsers.length === 0) {
+      searchResults.classList.add('justify-content-center')
       return(
-        <>No se encontraron resultados.</>
+        <span style={{fontWeight: 'bold'}}>No se encontraron resultados.</span>
       )
     } else {
-
+      searchResults.classList.add('justify-content-start')
       return (
         <>
           {filteredUsers.slice(0,10).map((user, index) => {
             return(
               <div key={index} className='search-element d-flex flex-row justify-content-start align-items-center'>
                 <div className='bg-image bg-image-cover search-icon'>
-                  <img src={`${ipfsData.protocol}://${ipfsData.host}/ipfs/${user.profilePic}`}/>
+                  <img alt={user.name} src={`${ipfsData.protocol}://${ipfsData.host}/ipfs/${user.profilePic}`}/>
                 </div>
                 <div className='d-flex flex-column justify-content-center align-items-start' style={{margin: '8px'}}>
                   <div style={{fontWeight: 'bold'}}>{user.name}</div>
