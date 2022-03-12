@@ -2,6 +2,13 @@ import { Card, Button } from 'react-bootstrap'
 import Search from './Search'
 
 function NewsFeed() {
+    const showSearchResultsContainer = (display) => {
+        if(display === 'none') {
+            document.activeElement.blur()
+        }
+
+        document.getElementById('resultsContainer').style.display = display        
+    } 
 
     const getNewsFeedElements = () => {
         const elements = [1, 2, 3, 4, 5]
@@ -29,8 +36,8 @@ function NewsFeed() {
     }
 
     return (
-        <div className='feed-container d-flex flex-column justify-content-start align-items-center'>
-            <Search />
+        <div className='feed-container d-flex flex-column justify-content-start align-items-center' onClick={() => {showSearchResultsContainer('none')}}>
+            <Search showSearchResultsContainer={showSearchResultsContainer}/>
             {getNewsFeedElements()}
         </div>
     )

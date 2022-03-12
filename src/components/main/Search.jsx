@@ -5,12 +5,11 @@ import SearchResults from './SearchResults'
 
 import '../../styles/Search.css'
 
-function Search() {
+function Search({showSearchResultsContainer}) {
     useEffect(() => {
         const listener = event => {
-            if(event.code === 'Escape' || event.code === 'Esc') {
-                document.activeElement.blur()
-                showResultsContainer('none')
+            if(event.code === 'Escape' || event.code === 'Esc') {                
+                showSearchResultsContainer('none')
             }
         }
 
@@ -22,13 +21,10 @@ function Search() {
     })
 
     const [searchText, setSearchText] = useState('')
-
-    const showResultsContainer = (display) => {
-        document.getElementById('resultsContainer').style.display = display        
-    } 
+    
 
     const performSearch = () => {
-        showResultsContainer('flex')
+        showSearchResultsContainer('flex')
         setSearchText(document.getElementById('searchInput').value.trim())
     }
 
@@ -42,16 +38,17 @@ function Search() {
         }
     }
 
-    const selectUser = (selectedUser) => {
+    const selectUser = (event, selectedUser) => {
+        event.stopPropagation()
         const recentSearches = getRecentSearches()
         recentSearches[selectedUser.userAddress] = selectedUser
         localStorage.setItem('recentSearches', JSON.stringify(recentSearches))
     }
-    
+
     return (
         <div className='search-container d-flex flex-column justify-content-start align-items-center'>
             <div className='d-flex flex-row justify-content-center' style={{width: '100%'}}>
-                <Form.Control id='searchInput' type="text"  placeholder='Search...' onFocus={() => {showResultsContainer('flex')}} onChange={performSearch}/>
+                <Form.Control id='searchInput' type="text"  placeholder='Search...' onFocus={(e) => {showSearchResultsContainer('flex')}} onChange={performSearch} onClick={(e) => {e.stopPropagation()}}/>
                 <InputGroup.Text><i className="bi bi-search"></i></InputGroup.Text>
             </div>                
             <div id='resultsContainer' className='search-results-container flex-column justify-content-start align-items-center'>                    

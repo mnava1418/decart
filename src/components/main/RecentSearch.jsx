@@ -52,7 +52,7 @@ function RecentSearch({getRecentSearches, selectUser}) {
         <>
           {Object.values(recentSearches).slice(0).reverse().slice(0,10).map((user, index) => {
             return(
-              <div key={index} className='search-element d-flex flex-row justify-content-start align-items-center' onClick={() => {selectUser(user)}}>
+              <div key={index} className='search-element d-flex flex-row justify-content-start align-items-center' onClick={(e) => {selectUser(e, user)}}>
                 <div className='bg-image bg-image-cover search-icon'>
                   <img alt={user.name} src={`${ipfsData.protocol}://${ipfsData.host}/ipfs/${user.profilePic}`}/>
                 </div>

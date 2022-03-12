@@ -41,7 +41,7 @@ function SearchResults({searchText, selectUser}) {
         <>
           {filteredUsers.slice(0,10).map((user, index) => {
             return(
-              <div key={index} className='search-element d-flex flex-row justify-content-start align-items-center' onClick={() => {selectUser(user)}}>
+              <div key={index} className='search-element d-flex flex-row justify-content-start align-items-center' onClick={(e) => {selectUser(e, user)}}>
                 <div className='bg-image bg-image-cover search-icon'>
                   <img alt={user.name} src={`${ipfsData.protocol}://${ipfsData.host}/ipfs/${user.profilePic}`}/>
                 </div>
@@ -59,7 +59,6 @@ function SearchResults({searchText, selectUser}) {
       )
     }
   }
-
 
   return (
       <div id='searchResults' className='search-results d-flex flex-column justify-content-start align-items-center'>
