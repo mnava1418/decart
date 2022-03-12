@@ -9,6 +9,7 @@ function Search() {
     useEffect(() => {
         const listener = event => {
             if(event.code === 'Escape' || event.code === 'Esc') {
+                document.activeElement.blur()
                 showResultsContainer('none')
             }
         }
@@ -55,7 +56,7 @@ function Search() {
             </div>                
             <div id='resultsContainer' className='search-results-container flex-column justify-content-start align-items-center'>                    
                 <div className='search-pin' />
-                {searchText.length === 0 ? <RecentSearch /> : <SearchResults searchText={searchText} selectUser={selectUser} />}
+                {searchText.length === 0 ? <RecentSearch getRecentSearches={getRecentSearches} selectUser={selectUser} /> : <SearchResults searchText={searchText} selectUser={selectUser} />}
             </div>
         </div>
     )
