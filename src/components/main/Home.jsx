@@ -6,6 +6,7 @@ import { isRegisterUserSelector } from '../../store/slices/usersSlice';
 import { APP_PAGES } from '../../config'
 import Register from './Register';
 import Main from './Main'
+import UserFeed from './UserFeed';
 import { Spinner } from 'react-bootstrap';
 
 import '../../styles/Main.css'
@@ -26,6 +27,8 @@ function Home({account, usersContract}) {
         return(<Register />)    
       case APP_PAGES.MAIN:
         return(<Main />)
+      case APP_PAGES.USER_FEED:
+        return(<UserFeed />)
       default:
         return(<Spinner animation="grow" />);
     }

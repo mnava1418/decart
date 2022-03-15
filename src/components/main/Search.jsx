@@ -1,11 +1,17 @@
 import { useState, useEffect } from 'react'
+import { useDispatch } from 'react-redux'
 import {Form, InputGroup} from 'react-bootstrap'
 import RecentSearch from './RecentSearch'
 import SearchResults from './SearchResults'
+import { setCurrentPage } from '../../store/slices/statusSlice'
+import { setSelectedUser } from '../../store/slices/usersSlice'
+import { APP_PAGES } from '../../config'
 
 import '../../styles/Search.css'
 
 function Search({showSearchResultsContainer}) {
+    const dispatch = useDispatch()
+
     useEffect(() => {
         const listener = event => {
             if(event.code === 'Escape' || event.code === 'Esc') {                
@@ -43,6 +49,8 @@ function Search({showSearchResultsContainer}) {
         const recentSearches = getRecentSearches()
         recentSearches[selectedUser.userAddress] = selectedUser
         localStorage.setItem('recentSearches', JSON.stringify(recentSearches))
+        dispatch(setSelectedUser(selectedUser))
+        dispatch(setCurrentPage(APP_PAGES.USER_FEED))
     }
 
     return (

@@ -4,6 +4,7 @@ const INITIAL_STATE = {
     isRegisterUser: false, //flag for the first time a user is created. No used for other purposes
     currentUser: undefined,
     allUsers: [],
+    selectedUser: undefined
 }
 
 export const usersSlice = createSlice({
@@ -20,6 +21,10 @@ export const usersSlice = createSlice({
 
         setAllUsers: (state, action) => {
             state.allUsers = action.payload
+        },
+
+        setSelectedUser: (state, action) => {
+            state.selectedUser = action.payload
         }
     }
 })
@@ -27,7 +32,8 @@ export const usersSlice = createSlice({
 export const {    
     loadCurrentUser,
     setIsRegisterUser,
-    setAllUsers
+    setAllUsers,
+    setSelectedUser,
 } = usersSlice.actions
 
 //Selectors
