@@ -1,8 +1,9 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Button } from 'react-bootstrap';
-import { isConnectedSelector, setIsConnected } from '../store/slices/statusSlice';
-import { currentUserSelector } from '../store/slices/usersSlice';
+import { isConnectedSelector, setIsConnected,setCurrentPage } from '../store/slices/statusSlice';
+import { currentUserSelector, setSelectedUser } from '../store/slices/usersSlice';
+import { APP_PAGES } from '../config';
 
 import logo from '../img/decartLogoWhite.png'
 import '../styles/NavBar.css'
@@ -31,11 +32,19 @@ function NavBar() {
     )
   }
 
+  const handleLinkClick = (page) => {
+    if(page === APP_PAGES.USER_FEED) {
+      dispatch(setSelectedUser({...currentUser}))
+    }
+
+    dispatch(setCurrentPage(page))
+  }
+
   const getLinks = () => {
     return(
       <div className='myNavBar-links'>
-        <i className="bi bi-house-fill"></i>
-        <i className="bi bi-person-fill"></i>
+        <i className="bi bi-house-fill" onClick={() => {handleLinkClick(APP_PAGES.MAIN)}}></i>
+        <i className="bi bi-person-fill" onClick={() => {handleLinkClick(APP_PAGES.USER_FEED)}}></i>
         <i className="bi bi-plus-circle-fill"></i>
       </div>
     )
