@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { Card, Button, Tooltip, OverlayTrigger, Form, Spinner } from 'react-bootstrap'
 import { PROFILE_ACTIONS, ipfsData } from '../../config'
-import { displayAlert } from '../helpers'
+import { displayAlert, getUserNumbers } from '../helpers'
 import { updateUser } from '../../services/usersService'
 import useLoadDapp from '../../hooks/useLoadDapp'
 import useStatus from '../../hooks/useStatus'
@@ -12,7 +12,6 @@ import { setIsProcessingGlobal, setComponentAlertGlobal } from '../../store/slic
 import '../../styles/Profile.css'
 
 function UserProfile({userInfo, editable, action}) {
-  const formatter = new Intl.NumberFormat('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 0})
   const {name, address, posts, followings, followers, cost, profilePic} = userInfo
   
   useEffect(() => {
@@ -40,39 +39,7 @@ function UserProfile({userInfo, editable, action}) {
     document.body.removeChild(elem);
     setToolTipText('Copiado!')
   }
-
-  const formatNumber = (num) => {
-      if (num >= 1000000000) {
-         return (num / 1000000000).toFixed(1).replace(/\.0$/, '') + 'b';
-      }
-      if (num >= 1000000) {
-         return (num / 1000000).toFixed(1).replace(/\.0$/, '') + 'm';
-      }
-      if (num >= 1000) {
-         return (num / 1000).toFixed(1).replace(/\.0$/, '') + 'k';
-      }
-      return num;
-  }
-
-  const getUserNumbers = () => {
-    const userNumbers = {Publicaciones: posts, Seguidores: followers, Seguidos: followings}
-    
-    return(
-      <div className='d-flex flex-row justify-content-between align-items-center' style={{fontSize: '0.9rem', margin: '24px 0px 24px 0px'}}>
-        {Object.keys(userNumbers).map((label, index) => {
-          return(
-            <OverlayTrigger key={index} placement='bottom' delay={{show: 1000}} overlay={<Tooltip id="tooltip-copy">{formatter.format(userNumbers[label])}</Tooltip>}>
-              <div className='d-flex flex-column justify-content-center align-items-center'>
-                <div style={{fontWeight: 'bold', cursor: 'pointer'}}>{formatNumber(userNumbers[label])}</div>
-                <div>{label}</div>
-              </div> 
-            </OverlayTrigger>
-          )
-        })}
-      </div>
-    )
-  }
-
+  
   const getMainButton = () => {
     if(action === PROFILE_ACTIONS.UPDATE){
       return (<Button variant="primary" onClick={handleUpdate} disabled={!hasChange}>Guardar</Button>)
@@ -146,7 +113,7 @@ function UserProfile({userInfo, editable, action}) {
             <div><i className="bi bi-clipboard"></i></div>
           </Card.Subtitle>
         </OverlayTrigger>
-        {getUserNumbers()}
+        {getUserNumbers(posts, followers, followings)}
         <div className='d-flex flex-column justify-content-center align-items-center' style={{fontSize: '0.9rem', margin: '24px 0px 24px 0px'}}>
           <Form.Group controlId="profileCost">
             <Form.Control className='profile-input profile-input-title' type="number" step={'any'} required defaultValue={cost} disabled={!editable} onChange={() => {setHasChange(true)}}/>
