@@ -43,4 +43,6 @@ export const isRegisterUserSelector = (state) => state.users.isRegisterUser
 
 export const allUsersSelector = (state) => state.users.allUsers
 
+export const selectedUserSelector = (state) => state.users.selectedUser
+
 export default usersSlice.reducer
