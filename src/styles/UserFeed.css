@@ -1,0 +1,87 @@
+.user-feed-container {
+    height: calc(100vh - var(--navBar-height) - var(--fill-bottom));
+    width: 100%;
+    overflow-y: auto;
+    position: relative;
+    max-width: 1000px;
+    background-color: var(--contrast-color);
+}
+
+.user-feed-pic {
+    border-radius: 50%;
+    background-color: var(--primary-color);
+    overflow: auto;
+    width: 77px;
+    height: 77px;
+    margin: 24px;
+}
+
+.user-feed-pic img {
+    width: 100%;
+    height: 100%;
+}
+
+.user-feed-info {
+    flex-grow: 1;
+    margin: 24px;
+}
+
+.user-feed-title {    
+    font-size: 1.25rem !important;
+    font-weight: 500 !important;
+}
+
+.user-feed-primary {
+    flex-direction: column;
+    justify-content: center;
+    align-items: start;
+}
+
+.user-feed-primary span {    
+    margin: 0px 0px 8px 0px;
+}
+
+.user-feed-not-mobile {
+    display: none;
+}
+
+.user-feed-mobile {
+    display: block;
+    width: 80%;
+}
+
+.user-feed-data {
+    font-size: 1rem;
+    font-style: normal;
+    font-weight: 500;
+}
+
+/*Medium devices (tablets, 768px and up)*/
+@media (min-width: 768px) { 
+    .user-feed-pic {
+        width: 150px;
+        height: 150px;
+    }
+
+    .user-feed-primary {
+        flex-direction: row;
+        justify-content: start;
+        align-items: center;
+    }
+
+    .user-feed-primary span {        
+        margin: 0px 24px 0px 0px;
+    }
+
+    .user-feed-info {
+        flex-grow: 0.2;
+    }
+
+    .user-feed-not-mobile {
+        display: block;
+    }
+
+    .user-feed-mobile {
+        display: none;
+    }
+}
