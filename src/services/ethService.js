@@ -1,58 +1,72 @@
 import Web3 from 'web3/dist/web3.min'
 import UsersContract from '../abis/Users.json'
-import { loadWeb3, loadDappInfo } from '../store/slices/ethSlice'
-import { setIsConnected, setIsProcessingGlobal, setComponentAlertGlobal } from '../store/slices/statusSlice'
-import { setIsRegisterUser } from '../store/slices/usersSlice'
+import { setWeb3, setAccount, setSmartContracts } from '../store/slices/ethSlice'
+import { setIsConnected, setCurrentPage } from '../store/slices/statusSlice'
 import { get } from './networkService'
-import { COINBASE_URL } from '../config'
-import { getCurrentUser, getAllUsers } from './usersService'
+import { COINBASE_URL, APP_PAGES } from '../config'
 
 const DECIMALS = (10**18)
 
-export const detectETHWallet = (isConnected, setShowAlert, dispatch) => {       
-    if(window.ethereum && window.ethereum.isMetaMask) {        
-        loadDappData(isConnected, setShowAlert, dispatch)
-    } else {        
-        dispatch(setIsConnected(false))
-        setShowAlert({show: true, link: 'https://metamask.io/download', linkText: 'MetaMask', text: 'Por favor descarga '})
-    }
+const SMART_CONTRACTS = {
+    usersContract: UsersContract
+}
+
+const isETHWalletDetected = () => {
+    return(window.ethereum)
 }  
 
-const loadDappData = async (isConnected, setShowAlert, dispatch) => {
-    const web3 = getWeb3(dispatch)
-    const account = await getAccount(web3, dispatch)
-    const users = await loadContract(web3, UsersContract)
-
-    if(!users) {
-        setShowAlert({show: true, link: '', linkText: '', text: 'Los contratos no están disponibles. Favor de seleccionar otra red.'})
-    } 
-    
-    if(users && account) {
-        dispatch(setIsConnected(true))
-
-        if(isConnected) {
-            dispatch(loadDappInfo({account, usersContract: users}))
-            subscribeToEvents(users, account, dispatch)
-            getAllUsers(users, dispatch)
-        }
-    } else {
-        dispatch(setIsConnected(false))
+export const loadDappData = async (dispatch, setAppAlert) => {
+    if(isETHWalletDetected) {
+        const web3 = loadWeb3(dispatch)
+        connectUser(web3, dispatch)
+        loadAllContracts(web3, setAppAlert, dispatch)
     }
 }
 
-const getWeb3 = (dispatch) => {
+const loadWeb3 = (dispatch) => {
     const web3 = new Web3(Web3.givenProvider || 'http://localhost:8545')
-    dispatch(loadWeb3(web3))
+    dispatch(setWeb3(web3))
     return web3
 }
 
-const getAccount = async (web3, dispatch) => {    
+const connectUser = async (web3, dispatch) => {
+    const userAccount = await getAccount(web3)
+    
+    if(userAccount) {
+        dispatch(setAccount(userAccount))
+        dispatch(setIsConnected(true))
+        dispatch(setCurrentPage(APP_PAGES.MAIN))
+    }
+}
+
+const getAccount = async (web3) => {    
     const accounts = await web3.eth.getAccounts()
     
     if(accounts.length > 0) {        
         return accounts[0]
     } else {
         return undefined
+    }
+}
+
+const loadAllContracts = async (web3, setAppAlert, dispatch) => {
+    let contractsReady = true
+    const contractsDef = {}
+    
+    for (const contractName in SMART_CONTRACTS) {
+        const contract = await loadContract(web3, SMART_CONTRACTS[contractName])
+
+        if(contract) {
+            contractsDef[contractName] = contract
+        } else {
+            contractsReady = false
+        }
+    }    
+    
+    if(contractsReady) {
+        dispatch(setSmartContracts(contractsDef))
+    } else {
+        setAppAlert({show: true, text: 'Los Smart Contracts no están disponibles en la red actual. Por favor, selecciona otra red.', link: '', linkText: ''})
     }
 }
 
@@ -80,25 +94,6 @@ export const getETHPrice = async () => {
     
     return ethPrice
 }
-
-const subscribeToEvents = (usersContract, account, dispatch) => {
-    usersContract.events.CreateUser()
-    .on('data', async (event) => {        
-        if(event.returnValues.userAddress === account) {
-            dispatch(setIsRegisterUser(true))
-        }
-    })
-
-    usersContract.events.UpdateUser()
-    .on('data', async (event) => {
-        if(event.returnValues.userAddress === account) {                  
-            getCurrentUser(account, usersContract, dispatch)      
-            dispatch(setIsProcessingGlobal(false))                  
-            dispatch(setComponentAlertGlobal({show: false, type: '', text: '', link: '', linkText: ''}))
-        }
-    })
-}
-
 
 export const fromWei = (amount) => {
     return (amount/DECIMALS)

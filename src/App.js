@@ -1,41 +1,28 @@
-import { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useEffect } from 'react';
+import { useDispatch } from 'react-redux';
 import { displayAlert } from './components/helpers';
 import NavBar from './components/NavBar';
-import { isConnectedSelector } from './store/slices/statusSlice';
-import { detectETHWallet } from './services/ethService';
-import useDapp from './hooks/useLoadDapp';
-import Landing from './components/landing/Landing'
+import { loadDappData } from './services/ethService';
 import Home from './components/main/Home';
-
+import useAlert from './hooks/useAlert';
 
 import './App.css';
 
 function App() {
-  const [showAlert, setShowAlert] = useState({show: false, text: '', link: '', linkText: ''})
-  const isConnected = useSelector(isConnectedSelector)  
-  const {account, dappLoaded, usersContract} = useDapp()
-
-  const dispatch = useDispatch()  
+  const {appAlert, setAppAlert} = useAlert()  
+  const dispatch = useDispatch()
   
   useEffect(() => {
-    detectETHWallet(isConnected, setShowAlert, dispatch)
-  }, [dispatch, isConnected])
-
-  const loadApp = () => {
-    if(isConnected && dappLoaded) {
-      return(<Home account={account} usersContract={usersContract} />)
-    } else {
-      return(<Landing />)
-    }
-  }
+    loadDappData(dispatch, setAppAlert)
+    // eslint-disable-next-line
+  }, [])
   
   return (
     <div className="App">
       <NavBar />
       <main className='fill-view'>
-        {showAlert.show ? displayAlert('danger', showAlert.text, showAlert.link, showAlert.linkText) : <></>}
-        {loadApp()}
+        {appAlert.show ? displayAlert('danger', appAlert.text, appAlert.link, appAlert.linkText) : <></>}
+        <Home />
       </main>
     </div>
   );
