@@ -3,6 +3,7 @@ export const APP_PAGES = {
     REGISTER: 2,    
     MAIN: 3,
     USER_FEED: 4,
+    LANDING: 5,
 }
 
 export const PROFILE_ACTIONS = {
