@@ -2,7 +2,7 @@ import { createSlice } from '@reduxjs/toolkit'
 import { APP_PAGES } from '../../config'
 
 const INITIAL_STATE = {
-    currentPage: APP_PAGES.LOADING,
+    currentPage: APP_PAGES.LANDING,
     isConnected: false,
     isProcessing: false,
     componentAlert: {
