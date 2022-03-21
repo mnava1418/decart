@@ -4,8 +4,8 @@
   --alternative-color: #5C5470;
   --contrast-color: #FFFFFF;
   --navBar-height: 64px;
-  --main-top: 24px;
-  --fill-bottom: 48px;
+  --main-top: 0px;
+  --fill-bottom: 0px;
 }
 
 .App {
