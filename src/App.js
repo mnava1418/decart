@@ -19,7 +19,7 @@ function App() {
   
   return (
     <div className="App">
-      <NavBar />
+      <NavBar setAppAlert={setAppAlert}/>
       <main className='fill-view'>
         {appAlert.show ? displayAlert('danger', appAlert.text, appAlert.link, appAlert.linkText) : <></>}
         <Home />
