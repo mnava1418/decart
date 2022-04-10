@@ -21,3 +21,10 @@ export const ipfsData = {
     port: 5001,
     protocol: 'https'
 }
+
+export const SIGN_MESSAGE = 'Please sign this message to validate you are the owner of the wallet. This request will not generate any cost or gas fees. Your authentication status will reset after 24 hours.'
+
+export const BASE_URLS = {
+    development: 'http://localhost:9001',
+}
+  
