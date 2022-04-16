@@ -1,7 +1,6 @@
 import { useSelector } from 'react-redux';
 import { currentPageSelector } from '../../store/slices/statusSlice'
 import { APP_PAGES } from '../../config'
-import Register from './Register';
 import Main from './Main'
 import UserFeed from './UserFeed';
 import { Spinner } from 'react-bootstrap';
@@ -13,9 +12,7 @@ function Home() {
   const currentPage = useSelector(currentPageSelector)
   
   const getPage = () => {
-    switch (currentPage) {
-      case APP_PAGES.REGISTER:
-        return(<Register />)    
+    switch (currentPage) {      
       case APP_PAGES.MAIN:
         return(<Main />)
       case APP_PAGES.USER_FEED:
