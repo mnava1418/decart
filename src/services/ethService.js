@@ -1,9 +1,9 @@
 import Web3 from 'web3/dist/web3.min'
 import UsersContract from '../abis/Users.json'
-import { setWeb3, setAccount, setSmartContracts } from '../store/slices/ethSlice'
-import { setIsConnected, setCurrentPage } from '../store/slices/statusSlice'
+import { setWeb3, setSmartContracts } from '../store/slices/ethSlice'
 import { get } from './networkService'
-import { COINBASE_URL, APP_PAGES } from '../config'
+import { COINBASE_URL } from '../config'
+import { loadUserInfo } from './usersService'
 
 const DECIMALS = (10**18)
 
@@ -18,7 +18,7 @@ const isETHWalletDetected = () => {
 export const loadDappData = async (dispatch, setAppAlert) => {
     if(isETHWalletDetected) {
         const web3 = loadWeb3(dispatch)
-        connectUser(web3, dispatch)
+        connectUser(web3, setAppAlert, dispatch)
         loadAllContracts(web3, setAppAlert, dispatch)
     }
 }
@@ -29,13 +29,11 @@ const loadWeb3 = (dispatch) => {
     return web3
 }
 
-const connectUser = async (web3, dispatch) => {
+const connectUser = async (web3, setAppAlert, dispatch) => {
     const userAccount = await getAccount(web3)
     
     if(userAccount) {
-        dispatch(setAccount(userAccount))
-        dispatch(setIsConnected(true))
-        dispatch(setCurrentPage(APP_PAGES.MAIN))
+        loadUserInfo(web3, userAccount, setAppAlert, dispatch, false)
     }
 }
 
@@ -66,7 +64,7 @@ const loadAllContracts = async (web3, setAppAlert, dispatch) => {
     if(contractsReady) {
         dispatch(setSmartContracts(contractsDef))
     } else {
-        setAppAlert({show: true, text: 'Los Smart Contracts no están disponibles en la red actual. Por favor, selecciona otra red.', link: '', linkText: ''})
+        setAppAlert({show: true, text: 'Smart Contracts not available. Please, use a different Network.', link: '', linkText: ''})
     }
 }
 
@@ -85,7 +83,7 @@ const loadContract = async (web3, contractDef) => {
 }
 
 export const getETHPrice = async () => {
-    const result = await get(COINBASE_URL, '/v2/prices/ETH-USD/spot', {})
+    const result = await get(COINBASE_URL, '/v2/prices/ETH-USD/spot')
     let ethPrice = 0.0
 
     if(result.status === 200) {
