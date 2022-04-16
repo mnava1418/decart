@@ -4,6 +4,7 @@ const INITIAL_STATE = {
     web3: undefined,
     account: undefined,
     usersContract: undefined,
+    walletDetected: false
 }
 
 export const ethSlice = createSlice({
@@ -20,6 +21,10 @@ export const ethSlice = createSlice({
 
         setSmartContracts: (state, action) => {
             state.usersContract = action.payload.usersContract
+        },
+
+        setWalletDetected: (state, action) => {
+            state.walletDetected = action.payload
         }
     }
 })
@@ -28,6 +33,7 @@ export const {
     setWeb3,
     setAccount,
     setSmartContracts,
+    setWalletDetected
 } = ethSlice.actions
 
 //Selectors
@@ -42,5 +48,6 @@ export const dappLoadedSelector = (state) => {
     return (account !== undefined && usersContract !== undefined)
 }
 
+export const walletDetectedSelector = (state) => state.eth.walletDetected
 
 export default ethSlice.reducer

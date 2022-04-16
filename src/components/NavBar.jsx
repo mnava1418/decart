@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Button } from 'react-bootstrap';
 import { isConnectedSelector, setCurrentPage } from '../store/slices/statusSlice';
 import { currentUserSelector, setSelectedUser } from '../store/slices/usersSlice';
+import { walletDetectedSelector } from '../store/slices/ethSlice'
 import { APP_PAGES } from '../config';
 import { loadUserInfo } from '../services/usersService';
 import useDapp from '../hooks/useLoadDapp';
@@ -15,6 +16,7 @@ function NavBar({setAppAlert}) {
 
   const isConnected = useSelector(isConnectedSelector)
   const currentUser = useSelector(currentUserSelector)
+  const walletDetected = useSelector(walletDetectedSelector)
 
   const {web3} = useDapp()
 
@@ -62,8 +64,8 @@ function NavBar({setAppAlert}) {
             <h3>Decart</h3>
         </div>  
         <div className='myNavBar-element justify-content-end'>
-          {isConnected && currentUser !== undefined ? getLinks() : <></>}
-          {!isConnected ? getConnectBtn() : <></>}
+          {isConnected && walletDetected && currentUser !== undefined ? getLinks() : <></>}
+          {!isConnected && walletDetected ? getConnectBtn() : <></>}
         </div>        
       </nav>
   );

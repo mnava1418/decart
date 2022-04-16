@@ -1,6 +1,6 @@
 import Web3 from 'web3/dist/web3.min'
 import UsersContract from '../abis/Users.json'
-import { setWeb3, setSmartContracts } from '../store/slices/ethSlice'
+import { setWeb3, setSmartContracts, setWalletDetected } from '../store/slices/ethSlice'
 import { get } from './networkService'
 import { COINBASE_URL } from '../config'
 import { loadUserInfo } from './usersService'
@@ -17,9 +17,12 @@ const isETHWalletDetected = () => {
 
 export const loadDappData = async (dispatch, setAppAlert) => {
     if(isETHWalletDetected) {
+        dispatch(setWalletDetected(true))
         const web3 = loadWeb3(dispatch)
         connectUser(web3, setAppAlert, dispatch)
         loadAllContracts(web3, setAppAlert, dispatch)
+    } else {
+        setAppAlert({show: true, text: 'No wallet detected. Download ', link: 'https://metamask.io/download/', linkText: 'Metamask'})
     }
 }
 
