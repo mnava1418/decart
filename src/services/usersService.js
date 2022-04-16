@@ -1,101 +1,93 @@
-import { setCurrentPage, setComponentAlertGlobal, setIsProcessingGlobal } from "../store/slices/statusSlice"
-import { APP_PAGES, REGISTRATION_COST, CONTACT_EMAIL, ipfsData } from "../config"
-import { getETHPrice } from './ethService'
-import { loadCurrentUser, setAllUsers } from "../store/slices/usersSlice"
-import { create } from 'ipfs-http-client'
+import { setCurrentPage, setIsConnected } from "../store/slices/statusSlice"
+import { APP_PAGES, SIGN_MESSAGE, BASE_URLS } from "../config"
+import { loadCurrentUser } from "../store/slices/usersSlice"
+import { post, get } from './networkService'
 
-export const getCurrentUser = async (account, usersContract, dispatch) => {    
-    const currentUser = await usersContract.methods.users(account).call()
-    
-    if(currentUser.valid) {
-        dispatch(setCurrentPage(APP_PAGES.MAIN))
-        dispatch(loadCurrentUser(currentUser))
+const JWT_KEY = 'jwt'
 
-    } else {
-        dispatch(setCurrentPage(APP_PAGES.REGISTER))
-        dispatch(loadCurrentUser(undefined))
-    }
+export const updateUser = () => {
+    //TO BE IMPLEMENTED
 }
 
-export const createUser = async (web3, account, usersContract, userInfo, registrationCost, setShowAlert, setIsProcessing) => {    
-    const profilePic = await uploadImg(userInfo.imgBuffer)
+export const loadUserInfo = async(web3, account, setAppAlert, dispatch) => {
+    const token = getCurrentToken()
+    setAppAlert({show: false})
 
-    //const profilePic = 'QmNmBvj2e7vjzgppVPfAiSmsH1KwaiUeNU2Hc3nX1w4Pgd'
- 
-    usersContract.methods.createUser(userInfo.name, userInfo.email, profilePic, web3.utils.toWei(`${userInfo.cost}`, 'ether'))
-    .send({from: account, value: web3.utils.toWei(`${registrationCost}`, 'ether')})
-    .on('transactionHash', (hash) => {
-        processOk(setShowAlert)
-    })
-    .on('error', (err) => {
-       processError(err, setShowAlert, setIsProcessing)
-    });
-}
+    if(token) {
+        const userInfo = await getUserInfo(token)
 
-export const updateUser = async(web3, account, usersContract, userInfo, setImgBuffer, dispatch) => {
-    if(userInfo.imgBuffer !== undefined) {
-        userInfo.profilePic = await uploadImg(userInfo.imgBuffer)
-        setImgBuffer(undefined)
-    }
-
-    usersContract.methods.updateUser(userInfo.name, userInfo.profilePic, web3.utils.toWei(`${userInfo.cost}`, 'ether'))
-    .send({from: account})
-    .on('transactionHash', (hash) => {        
-        dispatch(setComponentAlertGlobal({show: true, type: 'warning', text: 'La transacción está siendo procesada.', link: '', linkText: ''}))        
-    })
-    .on('error', (err) => {
-        console.error(err)
-
-        if(err.code !== 4001) {            
-            dispatch(setComponentAlertGlobal({show: true, type: 'danger', text: 'Error: Favor de contactarnos a ', link: `mailto:${CONTACT_EMAIL}`, linkText: `${CONTACT_EMAIL}`}))
+        if(userInfo) {
+            if(userInfo.hasOwnProperty('errorMessage')) {
+                setAppAlert({show: true, text: userInfo.errorMessage, link: '', linkText: ''})
+            } else {
+                dispatch(setIsConnected(true))
+                dispatch(setCurrentPage(APP_PAGES.MAIN))
+                dispatch(loadCurrentUser(userInfo))
+            }
+        } else {
+            localStorage.clear()
+            loadUserInfo(web3, account, setAppAlert, dispatch)
         }
-
-        dispatch(setIsProcessingGlobal(false))
-    });
-}
-
-export const getRegistrationCost = async() => {
-    const ethPrice = await getETHPrice()
-    
-    if(ethPrice > 0.0) {
-        return (REGISTRATION_COST / ethPrice).toFixed(8)
-    } else {
-        return 0.0
+    } else {        
+        login(account, web3, setAppAlert, dispatch)
     }
 }
 
-const processOk = (setShowAlert) => {
-    setShowAlert({show: true, type: 'warning', text: 'La transacción está siendo procesada.'})
+const getUserInfo = async (token) => {
+    const baseURL = BASE_URLS[process.env.NODE_ENV]
+    const userInfo = await get(baseURL, '/user', token)
+    .then((response) => {
+        switch(response.status) {
+            case 200:
+                return response.data.userInfo
+            case 401:                
+                return undefined
+            default:                
+                return {errorMessage: `${response.status} ${response.data.message}`}
+        }
+    })
+
+    return userInfo
 }
 
-const processError = (err, setShowAlert, setIsProcessing) => {
-    console.error(err)
-
-    if(err.code !== 4001) {
-        setShowAlert({show: true, type: 'danger', text: 'Error: Favor de contactarnos a ', link: `mailto:${CONTACT_EMAIL}`, linkText: `${CONTACT_EMAIL}`})
-    }
+const login = async (account, web3, setAppAlert, dispatch) => {
+    const validationResult = await validateUserAccount(web3, account)
+    const {signature, message, isValid} = validationResult
+    const info = {account, signature, message}
     
-    setIsProcessing(false)
-}
-
-const uploadImg = async (data) => {    
-    const ipfs = create(ipfsData)
-    const result = await ipfs.add(data)
-
-    return result.path
-}
-
-export const getAllUsers = async(usersContract, dispatch) => {
-    const users = []
-    const createUserEvents = await usersContract.getPastEvents('CreateUser', {fromBlock: 0, toBlock: 'latest'})
-    const addressCollection = createUserEvents.map(event => event.returnValues.userAddress)
-
-    for (const address of addressCollection) {
-        const user = await usersContract.methods.users(address).call()        
-        users.push(user)        
+    if(isValid) {
+        const baseURL = BASE_URLS[process.env.NODE_ENV]
+        post(baseURL, '/auth', info)
+        .then((response) => {
+            if(response.status === 200) {
+                localStorage.setItem(JWT_KEY, response.data.token)
+                loadUserInfo(web3, info.account, setAppAlert, dispatch)
+            } else {
+                setAppAlert({show: true, text: 'Unable to authenticate user. Please try later.', link: '', linkText: ''})
+            }
+        })
     }    
+}
 
-    users.sort((a,b) => parseFloat(b.followers) - parseFloat(a.followers))
-    
-    dispatch(setAllUsers(users))
+const getCurrentToken = () => {
+    const token = localStorage.getItem(JWT_KEY)
+
+    if(token === null || token === undefined) {
+        return undefined
+    } else {
+        return token
+    }
+}
+
+const validateUserAccount = async(web3, account) => {  
+    const result = await web3.eth.personal.sign(SIGN_MESSAGE, account)
+    .then((signature) => {   
+        return {isValid: true, signature, message: SIGN_MESSAGE}
+    })
+    .catch((err) => {
+        console.error(err)
+        return {isValid: false}
+    })
+
+    return result
 }
