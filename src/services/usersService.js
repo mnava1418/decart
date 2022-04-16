@@ -9,7 +9,7 @@ export const updateUser = () => {
     //TO BE IMPLEMENTED
 }
 
-export const loadUserInfo = async(web3, account, setAppAlert, dispatch) => {
+export const loadUserInfo = async(web3, account, setAppAlert, dispatch, forceLogin = true) => {
     const token = getCurrentToken()
     setAppAlert({show: false})
 
@@ -28,7 +28,7 @@ export const loadUserInfo = async(web3, account, setAppAlert, dispatch) => {
             localStorage.clear()
             loadUserInfo(web3, account, setAppAlert, dispatch)
         }
-    } else {        
+    } else if(forceLogin) {
         login(account, web3, setAppAlert, dispatch)
     }
 }
