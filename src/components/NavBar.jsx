@@ -1,17 +1,22 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Button } from 'react-bootstrap';
-import { isConnectedSelector, setIsConnected,setCurrentPage } from '../store/slices/statusSlice';
+import { isConnectedSelector, setCurrentPage } from '../store/slices/statusSlice';
 import { currentUserSelector, setSelectedUser } from '../store/slices/usersSlice';
 import { APP_PAGES } from '../config';
+import { loadUserInfo } from '../services/usersService';
+import useDapp from '../hooks/useLoadDapp';
+
 
 import logo from '../img/decartLogoWhite.png'
 import '../styles/NavBar.css'
 
-function NavBar() {  
+function NavBar({setAppAlert}) {  
 
   const isConnected = useSelector(isConnectedSelector)
   const currentUser = useSelector(currentUserSelector)
+
+  const {web3} = useDapp()
 
   const dispatch = useDispatch()
 
@@ -19,15 +24,15 @@ function NavBar() {
     const { ethereum } = window
     const accounts = await ethereum.request({method: 'eth_requestAccounts'})
     
-    if(accounts.length > 0 && accounts[0]) {
-      dispatch(setIsConnected(true))
-    }    
+    if(web3 && accounts.length > 0 && accounts[0]) {
+      loadUserInfo(web3, accounts[0], setAppAlert, dispatch)
+    }
   }
 
   const getConnectBtn = () => {
     return(
       <div className='myNavBar-links'>
-        <Button variant='primary' onClick={handleConnection}><i className='bi bi-wallet'></i>&nbsp;&nbsp;&nbsp;Conectar</Button>
+        <Button variant='primary' onClick={handleConnection}><i className='bi bi-wallet'></i>&nbsp;&nbsp;&nbsp;Connect</Button>
       </div>
     )
   }
