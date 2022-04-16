@@ -1,9 +1,8 @@
 export const APP_PAGES = {
     LOADING: 1,    
-    REGISTER: 2,    
-    MAIN: 3,
-    USER_FEED: 4,
-    LANDING: 5,
+    MAIN: 2,
+    USER_FEED: 3,
+    LANDING: 4,
 }
 
 export const PROFILE_ACTIONS = {
