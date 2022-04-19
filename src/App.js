@@ -1,30 +1,18 @@
-import { useEffect } from 'react';
-import { useDispatch } from 'react-redux';
-import { displayAlert } from './components/helpers';
-import NavBar from './components/NavBar';
-import { loadDappData } from './services/ethService';
-import Home from './components/main/Home';
-import useAlert from './hooks/useAlert';
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import Root from './Root';
+import Terms from './components/Terms';
+import { PATHS } from './config';
 
 import './App.css';
 
 function App() {
-  const {appAlert, setAppAlert} = useAlert()  
-  const dispatch = useDispatch()
-  
-  useEffect(() => {
-    loadDappData(dispatch, setAppAlert)
-    // eslint-disable-next-line
-  }, [])
-  
   return (
-    <div className="App">
-      <NavBar setAppAlert={setAppAlert}/>
-      <main className='fill-view'>
-        {appAlert.show ? displayAlert('danger', appAlert.text, appAlert.link, appAlert.linkText) : <></>}
-        <Home />
-      </main>
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path={PATHS.index} element={<Root />} />
+        <Route path={PATHS.terms} element={<Terms />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 

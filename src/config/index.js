@@ -27,3 +27,11 @@ export const BASE_URLS = {
     development: 'http://localhost:9001',
 }
   
+export const SITE_URL = {
+    development: 'http://localhost:3000',
+}
+
+export const PATHS = {
+    index: '/',
+    terms: '/terms',
+}
