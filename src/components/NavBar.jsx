@@ -1,4 +1,4 @@
-import React from 'react';
+import {useState} from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Button } from 'react-bootstrap';
 import { isConnectedSelector, setCurrentPage } from '../store/slices/statusSlice';
@@ -7,6 +7,7 @@ import { walletDetectedSelector } from '../store/slices/ethSlice'
 import { APP_PAGES } from '../config';
 import { loadUserInfo } from '../services/usersService';
 import useDapp from '../hooks/useLoadDapp';
+import TermsModal from './TermsModal';
 
 
 import logo from '../img/decartLogoWhite.png'
@@ -18,11 +19,14 @@ function NavBar({setAppAlert}) {
   const currentUser = useSelector(currentUserSelector)
   const walletDetected = useSelector(walletDetectedSelector)
 
+  const [showModal, setShowModal] = useState(false)
+
   const {web3} = useDapp()
 
   const dispatch = useDispatch()
 
   const handleConnection = async () => {
+    setShowModal(false)
     const { ethereum } = window
     const accounts = await ethereum.request({method: 'eth_requestAccounts'})
     
@@ -34,7 +38,7 @@ function NavBar({setAppAlert}) {
   const getConnectBtn = () => {
     return(
       <div className='myNavBar-links'>
-        <Button variant='primary' onClick={handleConnection}><i className='bi bi-wallet'></i>&nbsp;&nbsp;&nbsp;Connect</Button>
+        <Button variant='primary' onClick={() => setShowModal(true)}><i className='bi bi-wallet'></i>&nbsp;&nbsp;&nbsp;Connect</Button>
       </div>
     )
   }
@@ -58,6 +62,7 @@ function NavBar({setAppAlert}) {
   }
 
   return (
+      <>
       <nav className='myNavBar-main'>
         <div className='myNavBar-element myNavBar-logo justify-content-start'>
             <img src={logo} alt='Decart' width={56} height={56}/>
@@ -68,6 +73,8 @@ function NavBar({setAppAlert}) {
           {!isConnected && walletDetected ? getConnectBtn() : <></>}
         </div>        
       </nav>
+      <TermsModal show={showModal} confirm={handleConnection} cancel={() => setShowModal(false)} />
+      </>
   );
 }
 
