@@ -3,19 +3,19 @@ import { Card, Button, Spinner } from 'react-bootstrap'
 import UserProfile from './UserProfile'
 import { currentUserSelector } from '../../store/slices/usersSlice'
 import { PROFILE_ACTIONS } from '../../config'
-import { fromWei } from '../../services/ethService'
 
 function SecondarySection() {
   const currentUser = useSelector(currentUserSelector)
-  
+
   const getInfo = () => {    
     const userInfo = {
       name: currentUser.name,
-      address: currentUser.userAddress,
-      posts: parseFloat(currentUser.posts),
-      followers: parseFloat(currentUser.followers),
-      followings: parseFloat(currentUser.followings),
-      cost: fromWei(parseFloat(currentUser.cost)),
+      email: currentUser.email,
+      address: currentUser.address,
+      posts: currentUser.posts ? currentUser.posts.length : 0,
+      followers: currentUser.followers ? currentUser.followers.length : 0,
+      followings: currentUser.followings ? currentUser.followings.length : 0,
+      cost: currentUser.cost,
       profilePic: currentUser.profilePic
     }
 

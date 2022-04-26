@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { Card, Button, Tooltip, OverlayTrigger, Form, Spinner } from 'react-bootstrap'
+import identicon from 'identicon/dist/identicon'
 import { PROFILE_ACTIONS, ipfsData } from '../../config'
 import { displayAlert, getUserNumbers } from '../helpers'
 import { updateUser } from '../../services/usersService'
@@ -11,16 +12,27 @@ import { setIsProcessingGlobal, setComponentAlertGlobal } from '../../store/slic
 
 import '../../styles/Profile.css'
 
+export const PROFILE_IMG_INPUT_ID = 'profileImg'
+export const PROFILE_COVER_INPUT_ID = 'profileCover'
+
 function UserProfile({userInfo, editable, action}) {
-  const {name, address, posts, followings, followers, cost, profilePic} = userInfo
+  const {name, email, address, posts, followings, followers, cost, profilePic} = userInfo
   
   useEffect(() => {
-    document.getElementById('profileImg').style.backgroundImage = `url("${ipfsData.protocol}://${ipfsData.host}/ipfs/${profilePic}")`    
-  }, [profilePic])
+    if(profilePic.trim() === '') {
+      generateRandomProfilePic()
+    } else {
+      loadIpfsImage(PROFILE_IMG_INPUT_ID, profilePic)      
+    }    
+
+    // eslint-disable-next-line
+  }, [])
 
   const [tooltipText, setToolTipText] = useState('Copiar al Portapapeles')
   const [hasChange, setHasChange] = useState(false)
-  const [imgBuffer, setImgBuffer] = useState(undefined)
+  const [imgBuffer, setImgBuffer] = useState({})
+  const [selectedImg, setSelectedImg] = useState('')
+
   const {web3, usersContract} = useLoadDapp()
   
   const dispatch = useDispatch()
@@ -28,6 +40,18 @@ function UserProfile({userInfo, editable, action}) {
 
   const formatAddress = () => {
     return `${address.substring(0,5)}...${address.substring(address.length - 4, address.length)}`
+  }
+
+  const loadIpfsImage = (inputId, imageHash) => {
+    document.getElementById(inputId).style.backgroundImage = `url("${ipfsData.protocol}://${ipfsData.host}/ipfs/${imageHash}")`
+  }
+
+  const generateRandomProfilePic = () => {
+     const buffer = identicon.generateSync(address, 100)
+    const img = new Image()
+    img.src = buffer
+    document.getElementById(PROFILE_IMG_INPUT_ID).innerHTML = ''
+    document.getElementById(PROFILE_IMG_INPUT_ID).appendChild(img)    
   }
 
   const copyAddress = () => {
@@ -65,16 +89,20 @@ function UserProfile({userInfo, editable, action}) {
 
   const loadProfilePic = () => {
     const profileFile = document.getElementById('profileFile').files[0]
-    readProfilePicAsURL(profileFile)
-    readProfilePicAsBuffer(profileFile)
+    readImageAsURL(profileFile)
+    readImageAsBuffer(profileFile)
     setHasChange(true)
   }    
 
-  const readProfilePicAsURL = (profileFile) => {
+  const readImageAsURL = (profileFile) => {
     const reader = new FileReader()
 
     reader.onloadend = () => {
-        document.getElementById('profileImg').style.backgroundImage = `url(${reader.result})`            
+        if(selectedImg === PROFILE_IMG_INPUT_ID) {
+          document.getElementById(selectedImg).innerHTML = ''
+        }
+
+        document.getElementById(selectedImg).style.backgroundImage = `url(${reader.result})`
     }
 
     if(profileFile) {
@@ -82,12 +110,12 @@ function UserProfile({userInfo, editable, action}) {
     }
   }
 
-  const readProfilePicAsBuffer = (profileFile) => {
+  const readImageAsBuffer = (profileFile) => {
     const reader = new FileReader()
 
     reader.onloadend = () => {            
         const buffer = Buffer.from(reader.result)
-        setImgBuffer(buffer)            
+        setImgBuffer({...imgBuffer, [selectedImg]: buffer})        
     }
 
     if(profileFile) {
@@ -95,10 +123,19 @@ function UserProfile({userInfo, editable, action}) {
     }
   }
 
+  const selectImage = (event, inputId) => {
+    if(editable) {      
+      setSelectedImg(inputId)
+      document.getElementById('profileFile').click()
+    } 
+
+    event.stopPropagation()
+  }
+
   return (
     <Card className='main-element' style={{ width: '18rem' }}>   
-        <div className='bg-image bg-image-cover profile-card-background d-flex flex-column justify-content-center align-items-center'>
-          <div id='profileImg' className='bg-image bg-image-cover profile-img profile-card-img d-flex flex-column justify-content-center align-items-center' onClick={() => {document.getElementById('profileFile').click()}}/>
+        <div id={PROFILE_COVER_INPUT_ID} className='bg-image bg-image-cover profile-card-background d-flex flex-column justify-content-center align-items-center' onClick={(e) => {selectImage(e, PROFILE_COVER_INPUT_ID)}}>
+          <div id={PROFILE_IMG_INPUT_ID} className='bg-image bg-image-cover profile-img profile-card-img d-flex flex-column justify-content-center align-items-center' onClick={(e) => {selectImage(e, PROFILE_IMG_INPUT_ID)}}/>
         </div>  
         <Form.Control required id="profileFile" type="file" accept="image/*" hidden onChange={loadProfilePic}/>
         <Card.Body style={{marginTop: '50px'}}>
@@ -106,6 +143,11 @@ function UserProfile({userInfo, editable, action}) {
           <Form.Group controlId="profileName">
             <Form.Control className='profile-input profile-input-title' type="text" required defaultValue={name} disabled={!editable} onChange={() => {setHasChange(true)}}/>
           </Form.Group>
+        </Card.Title>
+        <Card.Title>
+          <Form.Group controlId="profileEmail">
+            <Form.Control className='profile-input' type="email" required defaultValue={email} placeholder='Enter your email' disabled={!editable} onChange={() => {setHasChange(true)}}/>
+          </Form.Group>          
         </Card.Title>
         <OverlayTrigger placement='bottom' overlay={<Tooltip id="tooltip-copy">{tooltipText}</Tooltip>} onExited={() => {setToolTipText('Copiar al Portapapeles')}}>
           <Card.Subtitle className="mb-2 text-muted d-flex flex-row justify-content-center align-items-center" style={{fontSize: '0.8rem', cursor: 'pointer'}} onClick= {copyAddress}>

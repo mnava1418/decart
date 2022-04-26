@@ -3,7 +3,8 @@
     height: 80px;
     background-image: url('../img/profileBackrground.jpg');
     position: relative;
-  }
+    cursor: pointer;
+  }  
   
   .profile-card-background::before {
     content: "";
