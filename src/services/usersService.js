@@ -43,7 +43,7 @@ const getUserInfo = async (token) => {
             case 401:                
                 return undefined
             default:                
-                return {errorMessage: `${response.status} ${response.data.message}`}
+                return {errorMessage: `${response.data.message}`}
         }
     })
 
