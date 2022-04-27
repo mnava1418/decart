@@ -141,7 +141,7 @@ function UserProfile({userInfo, editable, action}) {
         <Card.Body style={{marginTop: '50px'}}>
         <Card.Title>
           <Form.Group controlId="profileName">
-            <Form.Control className='profile-input profile-input-title' type="text" required defaultValue={name} disabled={!editable} onChange={() => {setHasChange(true)}}/>
+            <Form.Control className='profile-input profile-input-title' type="text" required defaultValue={name} placeholder='Enter your username' disabled={!editable} onChange={() => {setHasChange(true)}}/>
           </Form.Group>
         </Card.Title>
         <Card.Title>
