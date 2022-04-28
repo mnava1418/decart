@@ -5,7 +5,6 @@ import identicon from 'identicon/dist/identicon'
 import { PROFILE_ACTIONS, ipfsData } from '../../config'
 import { displayAlert, getUserNumbers } from '../helpers'
 import { updateUser } from '../../services/usersService'
-import useLoadDapp from '../../hooks/useLoadDapp'
 import useStatus from '../../hooks/useStatus'
 import { Buffer } from 'buffer'
 import { setIsProcessingGlobal, setComponentAlertGlobal } from '../../store/slices/statusSlice'
@@ -32,8 +31,8 @@ function UserProfile({userInfo, editable, action}) {
   const [hasChange, setHasChange] = useState(false)
   const [imgBuffer, setImgBuffer] = useState({})
   const [selectedImg, setSelectedImg] = useState('')
+  const [validated, setValidated] = useState(false)
 
-  const {web3, usersContract} = useLoadDapp()
   
   const dispatch = useDispatch()
   const {isProcessing, componentAlert} = useStatus()
@@ -74,16 +73,16 @@ function UserProfile({userInfo, editable, action}) {
   
   const handleUpdate = () => {    
     dispatch(setComponentAlertGlobal({...componentAlert, show: false}))
-    
-    const updatedName = document.getElementById('profileName').value
-    const updatedCost = document.getElementById('profileCost').value
+    setValidated(false)
 
-    if(updatedName.trim() === '' || updatedCost.trim() === '') {      
-      dispatch(setComponentAlertGlobal({show: true, type: 'danger', text: 'Campos obligatorios.', link: '', linkText: ''}))
-    } else {
-      dispatch(setIsProcessingGlobal(true))      
+    const form = document.getElementById('userProfileForm')
+
+    if(form.checkValidity() === true) {
+      dispatch(setIsProcessingGlobal(true))
       setHasChange(false)
-      updateUser(web3, address, usersContract, {name: updatedName, profilePic, cost: parseFloat(updatedCost), imgBuffer}, setImgBuffer, dispatch)      
+      updateUser()
+    } else {
+      setValidated(true)
     }
   }
 
@@ -133,39 +132,41 @@ function UserProfile({userInfo, editable, action}) {
   }
 
   return (
-    <Card className='main-element' style={{ width: '18rem' }}>   
-        <div id={PROFILE_COVER_INPUT_ID} className='bg-image bg-image-cover profile-card-background d-flex flex-column justify-content-center align-items-center' onClick={(e) => {selectImage(e, PROFILE_COVER_INPUT_ID)}}>
-          <div id={PROFILE_IMG_INPUT_ID} className='bg-image bg-image-cover profile-img profile-card-img d-flex flex-column justify-content-center align-items-center' onClick={(e) => {selectImage(e, PROFILE_IMG_INPUT_ID)}}/>
-        </div>  
-        <Form.Control required id="profileFile" type="file" accept="image/*" hidden onChange={loadProfilePic}/>
-        <Card.Body style={{marginTop: '50px'}}>
-        <Card.Title>
-          <Form.Group controlId="profileName">
-            <Form.Control className='profile-input profile-input-title' type="text" required defaultValue={name} placeholder='Enter your username' disabled={!editable} onChange={() => {setHasChange(true)}}/>
-          </Form.Group>
-        </Card.Title>
-        <Card.Title>
-          <Form.Group controlId="profileEmail">
-            <Form.Control className='profile-input' type="email" required defaultValue={email} placeholder='Enter your email' disabled={!editable} onChange={() => {setHasChange(true)}}/>
-          </Form.Group>          
-        </Card.Title>
-        <OverlayTrigger placement='bottom' overlay={<Tooltip id="tooltip-copy">{tooltipText}</Tooltip>} onExited={() => {setToolTipText('Copiar al Portapapeles')}}>
-          <Card.Subtitle className="mb-2 text-muted d-flex flex-row justify-content-center align-items-center" style={{fontSize: '0.8rem', cursor: 'pointer'}} onClick= {copyAddress}>
-            <div style={{marginRight: '8px'}}>{formatAddress()}</div>
-            <div><i className="bi bi-clipboard"></i></div>
-          </Card.Subtitle>
-        </OverlayTrigger>
-        {getUserNumbers(posts, followers, followings)}
-        <div className='d-flex flex-column justify-content-center align-items-center' style={{fontSize: '0.9rem', margin: '24px 0px 24px 0px'}}>
-          <Form.Group controlId="profileCost">
-            <Form.Control className='profile-input profile-input-title' type="number" step={'any'} required defaultValue={cost} disabled={!editable} onChange={() => {setHasChange(true)}}/>
-          </Form.Group>
-          <div>Membresía (ETH)</div>
-        </div>        
-        {componentAlert.show ? displayAlert(componentAlert.type, componentAlert.text, componentAlert.link, componentAlert.linkText) : <></>}
-        {isProcessing ? <Spinner animation='grow' /> : getMainButton()}
-        </Card.Body>
-    </Card>
+    <Form id='userProfileForm' noValidate validated={validated}>
+      <Card className='main-element' style={{ width: '18rem' }}>   
+          <div id={PROFILE_COVER_INPUT_ID} className='bg-image bg-image-cover profile-card-background d-flex flex-column justify-content-center align-items-center' onClick={(e) => {selectImage(e, PROFILE_COVER_INPUT_ID)}}>
+            <div id={PROFILE_IMG_INPUT_ID} className='bg-image bg-image-cover profile-img profile-card-img d-flex flex-column justify-content-center align-items-center' onClick={(e) => {selectImage(e, PROFILE_IMG_INPUT_ID)}}/>
+          </div>  
+          <Form.Control id="profileFile" type="file" accept="image/*" hidden onChange={loadProfilePic}/>
+          <Card.Body style={{marginTop: '50px'}}>
+          <Card.Title>
+            <Form.Group controlId="profileName">
+              <Form.Control className='profile-input profile-input-title' type="text" required defaultValue={name} placeholder='Enter your username' disabled={!editable} onChange={() => {setHasChange(true)}}/>
+            </Form.Group>
+          </Card.Title>
+          <Card.Title>
+            <Form.Group controlId="profileEmail">
+              <Form.Control className='profile-input' type="email" required defaultValue={email} placeholder='Enter your email' disabled={!editable} onChange={() => {setHasChange(true)}}/>
+            </Form.Group>          
+          </Card.Title>
+          <OverlayTrigger placement='bottom' overlay={<Tooltip id="tooltip-copy">{tooltipText}</Tooltip>} onExited={() => {setToolTipText('Copiar al Portapapeles')}}>
+            <Card.Subtitle className="mb-2 text-muted d-flex flex-row justify-content-center align-items-center" style={{fontSize: '0.8rem', cursor: 'pointer'}} onClick= {copyAddress}>
+              <div style={{marginRight: '8px'}}>{formatAddress()}</div>
+              <div><i className="bi bi-clipboard"></i></div>
+            </Card.Subtitle>
+          </OverlayTrigger>
+          {getUserNumbers(posts, followers, followings)}
+          <div className='d-flex flex-column justify-content-center align-items-center' style={{fontSize: '0.9rem', margin: '24px 0px 24px 0px'}}>
+            <Form.Group controlId="profileCost">
+              <Form.Control className='profile-input profile-input-title' type="number" step={'any'} required defaultValue={cost} disabled={!editable} onChange={() => {setHasChange(true)}}/>
+            </Form.Group>
+            <div>Membresía (ETH)</div>
+          </div>        
+          {componentAlert.show ? displayAlert(componentAlert.type, componentAlert.text, componentAlert.link, componentAlert.linkText) : <></>}
+          {isProcessing ? <Spinner animation='grow' /> : getMainButton()}
+          </Card.Body>
+      </Card>
+    </Form>
   )
 }
 
