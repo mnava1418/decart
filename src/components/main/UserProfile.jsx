@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { useDispatch } from 'react-redux'
 import { Card, Button, Tooltip, OverlayTrigger, Form, Spinner } from 'react-bootstrap'
 import identicon from 'identicon/dist/identicon'
@@ -6,6 +6,7 @@ import { PROFILE_ACTIONS, ipfsData } from '../../config'
 import { displayAlert, getUserNumbers } from '../helpers'
 import { updateUser } from '../../services/usersService'
 import useStatus from '../../hooks/useStatus'
+import useUserProfile from '../../hooks/useUserProfile'
 import { Buffer } from 'buffer'
 import { setIsProcessingGlobal, setComponentAlertGlobal } from '../../store/slices/statusSlice'
 
@@ -15,7 +16,7 @@ export const PROFILE_IMG_INPUT_ID = 'profileImg'
 export const PROFILE_COVER_INPUT_ID = 'profileCover'
 
 function UserProfile({userInfo, editable, action}) {
-  const {name, email, address, posts, followings, followers, cost, profilePic} = userInfo
+  const {name, email, address, posts, followings, followers, cost, profilePic, coverPic} = userInfo
   
   useEffect(() => {
     if(profilePic.trim() === '') {
@@ -24,15 +25,20 @@ function UserProfile({userInfo, editable, action}) {
       loadIpfsImage(PROFILE_IMG_INPUT_ID, profilePic)      
     }    
 
+    if(coverPic.trim() !== '') {
+      loadIpfsImage(PROFILE_COVER_INPUT_ID, coverPic)      
+    }
+
     // eslint-disable-next-line
   }, [])
 
-  const [tooltipText, setToolTipText] = useState('Copiar al Portapapeles')
-  const [hasChange, setHasChange] = useState(false)
-  const [imgBuffer, setImgBuffer] = useState({})
-  const [selectedImg, setSelectedImg] = useState('')
-  const [validated, setValidated] = useState(false)
-
+  const {
+    tooltipText, setToolTipText,
+    hasChange, setHasChange,
+    imgBuffer, setImgBuffer,
+    selectedImg, setSelectedImg,
+    validated, setValidated,    
+  } = useUserProfile() 
   
   const dispatch = useDispatch()
   const {isProcessing, componentAlert} = useStatus()
@@ -80,7 +86,16 @@ function UserProfile({userInfo, editable, action}) {
     if(form.checkValidity() === true) {
       dispatch(setIsProcessingGlobal(true))
       setHasChange(false)
-      updateUser()
+
+      const updatedUserInfo = {
+        name: document.getElementById('profileName').value,
+        email: document.getElementById('profileEmail').value,
+        cost: document.getElementById('profileCost').value,
+        profilePic,
+        coverPic        
+      }
+      
+      updateUser(updatedUserInfo, imgBuffer, componentAlert, dispatch)
     } else {
       setValidated(true)
     }

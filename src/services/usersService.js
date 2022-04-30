@@ -1,12 +1,41 @@
-import { setCurrentPage, setIsConnected } from "../store/slices/statusSlice"
-import { APP_PAGES, SIGN_MESSAGE, BASE_URLS } from "../config"
+import { create } from 'ipfs-http-client'
+import { setCurrentPage, setIsConnected, setIsProcessingGlobal, setComponentAlertGlobal } from "../store/slices/statusSlice"
+import { APP_PAGES, SIGN_MESSAGE, BASE_URLS, ipfsData } from "../config"
 import { loadCurrentUser } from "../store/slices/usersSlice"
 import { post, get } from './networkService'
+import { PROFILE_IMG_INPUT_ID, PROFILE_COVER_INPUT_ID } from '../components/main/UserProfile'
 
 const JWT_KEY = 'jwt'
 
-export const updateUser = () => {
-    //TO BE IMPLEMENTED
+export const updateUser = async(userInfo, imgBuffer, componentAlert, dispatch) => {
+    const baseURL = BASE_URLS[process.env.NODE_ENV]
+    const token = getCurrentToken()
+
+    if(imgBuffer[PROFILE_IMG_INPUT_ID] !== undefined) {
+        userInfo.profilePic = await uploadImg(imgBuffer[PROFILE_IMG_INPUT_ID])
+    }
+
+    if(imgBuffer[PROFILE_COVER_INPUT_ID] !== undefined) {
+        userInfo.coverPic = await uploadImg(imgBuffer[PROFILE_COVER_INPUT_ID])
+    }    
+    
+    post(baseURL, '/user', userInfo, token)
+    .then((response) => {
+        dispatch(setIsProcessingGlobal(false))
+
+        if(response.status === 200) {
+            dispatch(setComponentAlertGlobal({...componentAlert, show: true, type: 'success', text: 'Changes saved.'}))
+        } else {
+            dispatch(setComponentAlertGlobal({...componentAlert, show: true, type: 'danger', text: response.data.message}))
+        }
+    })
+}
+
+const uploadImg = async (data) => {    
+    const ipfs = create(ipfsData)
+    const result = await ipfs.add(data)
+
+    return result.path
 }
 
 export const loadUserInfo = async(web3, account, setAppAlert, dispatch, forceLogin = true) => {

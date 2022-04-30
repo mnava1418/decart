@@ -16,7 +16,8 @@ function SecondarySection() {
       followers: currentUser.followers ? currentUser.followers.length : 0,
       followings: currentUser.followings ? currentUser.followings.length : 0,
       cost: currentUser.cost,
-      profilePic: currentUser.profilePic
+      profilePic: currentUser.profilePic,
+      coverPic: currentUser.coverPic
     }
 
     return (
