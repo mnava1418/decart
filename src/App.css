@@ -1,9 +1,10 @@
 :root {
-  --primary-color: #DBD8E3;
-  --secondary-color: #2A2438;
-  --alternative-color: #5C5470;
+  --primary-color: #132D46;
+  --secondary-color: #191E29;
+  --alternative-color: #01C38D;
   --contrast-color: #FFFFFF;
-  --navBar-height: 64px;
+  --extra-color: #696E79;
+  --navBar-height: 80px;
   --main-top: 0px;
   --fill-bottom: 0px;
 }
