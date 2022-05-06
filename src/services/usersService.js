@@ -41,11 +41,11 @@ const uploadImg = async (data) => {
 export const loadUserInfo = async(web3, account, setAppAlert, dispatch, forceLogin = true) => {
     const token = getCurrentToken()
     setAppAlert({show: false})
-
+    
     if(token) {
         const userInfo = await getUserInfo(token)
 
-        if(userInfo) {
+        if(userInfo && userInfo.address.toUpperCase() === account.toUpperCase()) {
             if(userInfo.hasOwnProperty('errorMessage')) {
                 setAppAlert({show: true, text: userInfo.errorMessage, link: '', linkText: ''})
             } else {
