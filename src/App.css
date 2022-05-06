@@ -45,6 +45,10 @@
 .bg-image-cover {
   background-size: cover;
 }
+.card {
+  border: 0px !important;
+  border-radius: 0px !important;  
+}
 
 /**END Generic components**/
 
