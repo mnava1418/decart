@@ -45,14 +45,13 @@ export const loadUserInfo = async(web3, account, setAppAlert, dispatch, forceLog
     if(token) {
         const userInfo = await getUserInfo(token)
 
-        if(userInfo && userInfo.address.toUpperCase() === account.toUpperCase()) {
-            if(userInfo.hasOwnProperty('errorMessage')) {
-                setAppAlert({show: true, text: userInfo.errorMessage, link: '', linkText: ''})
-            } else {
-                dispatch(setIsConnected(true))
-                dispatch(setCurrentPage(APP_PAGES.MAIN))
-                dispatch(loadCurrentUser(userInfo))
-            }
+        if(userInfo.hasOwnProperty('errorMessage')) {
+            localStorage.clear()
+            setAppAlert({show: true, text: userInfo.errorMessage, link: '', linkText: ''})
+        } else if(userInfo && userInfo.address.toUpperCase() === account.toUpperCase()) {
+            dispatch(setIsConnected(true))
+            dispatch(setCurrentPage(APP_PAGES.MAIN))
+            dispatch(loadCurrentUser(userInfo))
         } else {
             localStorage.clear()
             loadUserInfo(web3, account, setAppAlert, dispatch)
