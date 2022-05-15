@@ -5,7 +5,7 @@ import { getUserNumbers } from '../helpers'
 import { fromWei } from '../../services/ethService'
 
 function UserData({selectedUser, currentUser}) {  
-  const [tooltipText, setToolTipText] = useState('Copiar al Portapapeles')
+  const [tooltipText, setToolTipText] = useState('Copy to clipboard')
 
   const formatAddress = (address) => {
     return `${address.substring(0,5)}...${address.substring(address.length - 4, address.length)}`
@@ -18,7 +18,7 @@ function UserData({selectedUser, currentUser}) {
     elem.select();
     document.execCommand('copy');
     document.body.removeChild(elem);
-    setToolTipText('Copiado!')
+    setToolTipText('Copied!')
   }
 
   const getFollowBtn = () => {
@@ -30,7 +30,7 @@ function UserData({selectedUser, currentUser}) {
   const getUserData = () => {
     return(
       <div className='d-flex flex-column justify-content-center align-items-start user-feed-data'>
-        <OverlayTrigger placement='bottom' overlay={<Tooltip id="tooltip-copy">{tooltipText}</Tooltip>} onExited={() => {setToolTipText('Copiar al Portapapeles')}}>          
+        <OverlayTrigger placement='bottom' overlay={<Tooltip id="tooltip-copy">{tooltipText}</Tooltip>} onExited={() => {setToolTipText('Copy to clipboard')}}>          
           <div style={{cursor: 'pointer'}} onClick={() => {copyAddress(selectedUser.userAddress)}}><i class="bi bi-wallet"></i> {formatAddress(selectedUser.userAddress)}</div>
         </OverlayTrigger>
         <div><i class="bi bi-envelope"></i> {selectedUser.email}</div>

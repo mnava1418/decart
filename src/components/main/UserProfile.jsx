@@ -66,12 +66,12 @@ function UserProfile({userInfo, editable, action}) {
     elem.select();
     document.execCommand('copy');
     document.body.removeChild(elem);
-    setToolTipText('Copiado!')
+    setToolTipText('Copied!')
   }
   
   const getMainButton = () => {
     if(action === PROFILE_ACTIONS.UPDATE){
-      return (<Button variant="primary" onClick={handleUpdate} disabled={!hasChange}>Guardar</Button>)
+      return (<Button variant="primary" onClick={handleUpdate} disabled={!hasChange}>Save</Button>)
     } else {
       return(<></>)
     }
@@ -164,7 +164,7 @@ function UserProfile({userInfo, editable, action}) {
               <Form.Control className='profile-input' type="email" required defaultValue={email} placeholder='Enter your email' disabled={!editable} onChange={() => {setHasChange(true)}}/>
             </Form.Group>          
           </Card.Title>
-          <OverlayTrigger placement='bottom' overlay={<Tooltip id="tooltip-copy">{tooltipText}</Tooltip>} onExited={() => {setToolTipText('Copiar al Portapapeles')}}>
+          <OverlayTrigger placement='bottom' overlay={<Tooltip id="tooltip-copy">{tooltipText}</Tooltip>} onExited={() => {setToolTipText('Copy to clipboard')}}>
             <Card.Subtitle className="mb-2 text-muted d-flex flex-row justify-content-center align-items-center" style={{fontSize: '0.8rem', cursor: 'pointer'}} onClick= {copyAddress}>
               <div style={{marginRight: '8px'}}>{formatAddress()}</div>
               <div><i className="bi bi-clipboard"></i></div>
@@ -175,7 +175,7 @@ function UserProfile({userInfo, editable, action}) {
             <Form.Group controlId="profileCost">
               <Form.Control className='profile-input profile-input-title' type="number" step={'any'} required defaultValue={cost} disabled={!editable} onChange={() => {setHasChange(true)}}/>
             </Form.Group>
-            <div>Membresía (ETH)</div>
+            <div>Cost (ETH)</div>
           </div>        
           {componentAlert.show ? displayAlert(componentAlert.type, componentAlert.text, componentAlert.link, componentAlert.linkText) : <></>}
           {isProcessing ? <Spinner animation='grow' /> : getMainButton()}

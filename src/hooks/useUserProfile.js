@@ -1,7 +1,7 @@
 import { useState } from 'react'
 
 function useUserProfile() {
-    const [tooltipText, setToolTipText] = useState('Copiar al Portapapeles')
+    const [tooltipText, setToolTipText] = useState('Copy to clipboard')
     const [hasChange, setHasChange] = useState(false)
     const [imgBuffer, setImgBuffer] = useState({})
     const [selectedImg, setSelectedImg] = useState('')

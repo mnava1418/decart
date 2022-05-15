@@ -25,7 +25,7 @@ export const displayAlert = (variant, text, link, linkText) => {
 }
 
 export const getUserNumbers = (posts, followers, followings, margin = '24px 0px 24px 0px') => {
-    const userNumbers = {Publicaciones: posts, Seguidores: followers, Seguidos: followings}
+    const userNumbers = {posts, followers, followings}
     
     return(
       <div className='d-flex flex-row justify-content-between align-items-center' style={{fontSize: '0.9rem', margin }}>
