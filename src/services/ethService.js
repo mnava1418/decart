@@ -37,6 +37,8 @@ const connectUser = async (web3, setAppAlert, dispatch) => {
     
     if(userAccount) {
         loadUserInfo(web3, userAccount, setAppAlert, dispatch, false)
+    } else {
+        localStorage.clear()
     }
 }
 

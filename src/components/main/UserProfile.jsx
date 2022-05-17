@@ -9,6 +9,7 @@ import useStatus from '../../hooks/useStatus'
 import useUserProfile from '../../hooks/useUserProfile'
 import { Buffer } from 'buffer'
 import { setIsProcessingGlobal, setComponentAlertGlobal } from '../../store/slices/statusSlice'
+import { getETHPrice } from '../../services/ethService'
 
 import '../../styles/Profile.css'
 
@@ -29,6 +30,8 @@ function UserProfile({userInfo, editable, action}) {
       loadIpfsImage(PROFILE_COVER_INPUT_ID, coverPic)      
     }
 
+    setUSDCost()
+
     // eslint-disable-next-line
   }, [])
 
@@ -45,6 +48,23 @@ function UserProfile({userInfo, editable, action}) {
 
   const formatAddress = () => {
     return `${address.substring(0,5)}...${address.substring(address.length - 4, address.length)}`
+  }
+
+  const setUSDCost = async () => {
+    const ethPrice = await getETHPrice()
+    document.getElementById('profileCostUSD').value = parseFloat(cost * ethPrice).toFixed(2)
+  }
+
+  const convertCost = async(toETH) => {
+    const ethPrice = await getETHPrice()
+    const ethCost = parseFloat(document.getElementById('profileCost').value)
+    const usdCost = parseFloat(document.getElementById('profileCostUSD').value)
+
+    if(toETH) {
+      document.getElementById('profileCost').value = parseFloat(usdCost / ethPrice).toFixed(6)
+    } else {
+      document.getElementById('profileCostUSD').value = parseFloat(ethCost * ethPrice).toFixed(2)
+    }
   }
 
   const loadIpfsImage = (inputId, imageHash) => {
@@ -171,12 +191,30 @@ function UserProfile({userInfo, editable, action}) {
             </Card.Subtitle>
           </OverlayTrigger>
           {getUserNumbers(posts, followers, followings)}
-          <div className='d-flex flex-column justify-content-center align-items-center' style={{fontSize: '0.9rem', margin: '24px 0px 24px 0px'}}>
-            <Form.Group controlId="profileCost">
-              <Form.Control className='profile-input profile-input-title' type="number" step={'any'} required defaultValue={cost} disabled={!editable} onChange={() => {setHasChange(true)}}/>
-            </Form.Group>
-            <div>Cost (ETH)</div>
-          </div>        
+          <div className='d-flex flex-row justify-content-center align-items-center'>
+            <div className='d-flex flex-column justify-content-center align-items-center' style={{fontSize: '0.9rem', margin: '24px 0px 24px 0px'}}>
+              <Form.Group controlId="profileCost">
+                <Form.Control className='profile-input profile-input-title' type="number" step={'any'} required defaultValue={cost} disabled={!editable} 
+                  onChange={() => {
+                    setHasChange(true)
+                    convertCost(false)
+                  }}
+                />
+              </Form.Group>
+              <div>Cost (ETH)</div>
+            </div>    
+            <div className='d-flex flex-column justify-content-center align-items-center' style={{fontSize: '0.9rem', margin: '24px 0px 24px 0px'}}>
+              <Form.Group controlId="profileCostUSD">
+                <Form.Control className='profile-input profile-input-title' type="number" step={'any'} required defaultValue={0} disabled={!editable} 
+                  onChange={() => {
+                    setHasChange(true)
+                    convertCost(true)
+                  }}
+                />
+              </Form.Group>
+              <div>Cost (USD)</div>
+            </div>     
+          </div>   
           {componentAlert.show ? displayAlert(componentAlert.type, componentAlert.text, componentAlert.link, componentAlert.linkText) : <></>}
           {isProcessing ? <Spinner animation='grow' /> : getMainButton()}
           </Card.Body>
