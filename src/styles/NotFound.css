@@ -3,11 +3,16 @@
     width: 100%;
     background-color: var(--primary-color);
     color: #fff;
+    text-align: center;
 }
 
 .not-found-container div h1 {
     font-size: 100px;
     margin-bottom: 24px;
+}
+
+.not-found-container div h2 {
+    font-size: 50px;
 }
 
 .not-found-link {
