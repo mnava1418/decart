@@ -25,7 +25,8 @@ function SecondarySection() {
         <UserProfile
           userInfo={userInfo}
           editable={true}
-          action={PROFILE_ACTIONS.UPDATE}          
+          action={PROFILE_ACTIONS.UPDATE}
+          currentUser={currentUser}
         />
         <Card className='main-element' style={{ width: '18rem' }}>          
           <Card.Body>

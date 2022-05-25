@@ -7,9 +7,10 @@ import { PROFILE_IMG_INPUT_ID, PROFILE_COVER_INPUT_ID } from '../components/main
 
 const JWT_KEY = 'jwt'
 
-export const updateUser = async(userInfo, imgBuffer, componentAlert, dispatch) => {
+export const updateUser = async(userInfo, imgBuffer, componentAlert, currentUser, dispatch) => {
     const baseURL = BASE_URLS[process.env.NODE_ENV]
     const token = getCurrentToken()
+    userInfo.isDefault = currentUser.isDefault
 
     if(imgBuffer[PROFILE_IMG_INPUT_ID] !== undefined) {
         userInfo.profilePic = await uploadImg(imgBuffer[PROFILE_IMG_INPUT_ID])
@@ -25,6 +26,7 @@ export const updateUser = async(userInfo, imgBuffer, componentAlert, dispatch) =
 
         if(response.status === 200) {
             dispatch(setComponentAlertGlobal({...componentAlert, show: true, type: 'success', text: 'Changes saved.'}))
+            dispatch(loadCurrentUser({...currentUser, isDefault: 0}))
         } else {
             dispatch(setComponentAlertGlobal({...componentAlert, show: true, type: 'danger', text: response.data.message}))
         }

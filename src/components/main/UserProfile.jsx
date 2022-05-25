@@ -16,7 +16,7 @@ import '../../styles/Profile.css'
 export const PROFILE_IMG_INPUT_ID = 'profileImg'
 export const PROFILE_COVER_INPUT_ID = 'profileCover'
 
-function UserProfile({userInfo, editable, action}) {
+function UserProfile({userInfo, editable, action, currentUser}) {
   const {name, email, address, posts, followings, followers, cost, profilePic, coverPic} = userInfo
   
   useEffect(() => {
@@ -115,7 +115,7 @@ function UserProfile({userInfo, editable, action}) {
         coverPic        
       }
       
-      updateUser(updatedUserInfo, imgBuffer, componentAlert, dispatch)
+      updateUser(updatedUserInfo, imgBuffer, componentAlert, currentUser, dispatch)
     } else {
       setValidated(true)
     }
