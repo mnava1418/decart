@@ -47,7 +47,7 @@ export const loadUserInfo = async(web3, account, setAppAlert, dispatch, forceLog
     if(token) {
         const userInfo = await getUserInfo(token)
 
-        if(userInfo.hasOwnProperty('errorMessage')) {
+        if(userInfo && userInfo.hasOwnProperty('errorMessage')) {
             localStorage.clear()
             setAppAlert({show: true, text: userInfo.errorMessage, link: '', linkText: ''})
         } else if(userInfo && userInfo.address.toUpperCase() === account.toUpperCase()) {
