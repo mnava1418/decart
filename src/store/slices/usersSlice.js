@@ -25,6 +25,13 @@ export const usersSlice = createSlice({
 
         setSelectedUser: (state, action) => {
             state.selectedUser = action.payload
+        },
+
+        resetUserState: (state) => {
+            state.isRegisterUser = INITIAL_STATE.isRegisterUser
+            state.currentUser = INITIAL_STATE.currentUser
+            state.allUsers = INITIAL_STATE.allUsers
+            state.selectedUser = INITIAL_STATE.selectedUser
         }
     }
 })
@@ -34,6 +41,7 @@ export const {
     setIsRegisterUser,
     setAllUsers,
     setSelectedUser,
+    resetUserState
 } = usersSlice.actions
 
 //Selectors

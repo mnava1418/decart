@@ -35,3 +35,7 @@ export const PATHS = {
     index: '/',
     terms: '/terms',
 }
+
+//Local Storage keys
+export const JWT_KEY = 'jwt'
+export const ADDRESS_KEY = 'address'

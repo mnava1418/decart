@@ -1,11 +1,10 @@
 import { create } from 'ipfs-http-client'
 import { setCurrentPage, setIsConnected, setIsProcessingGlobal, setComponentAlertGlobal } from "../store/slices/statusSlice"
 import { APP_PAGES, SIGN_MESSAGE, BASE_URLS, ipfsData } from "../config"
-import { loadCurrentUser } from "../store/slices/usersSlice"
+import { loadCurrentUser, resetUserState } from "../store/slices/usersSlice"
 import { post, get } from './networkService'
 import { PROFILE_IMG_INPUT_ID, PROFILE_COVER_INPUT_ID } from '../components/main/UserProfile'
-
-const JWT_KEY = 'jwt'
+import { JWT_KEY, ADDRESS_KEY } from '../config'
 
 export const updateUser = async(userInfo, imgBuffer, componentAlert, currentUser, dispatch) => {
     const baseURL = BASE_URLS[process.env.NODE_ENV]
@@ -54,6 +53,7 @@ export const loadUserInfo = async(web3, account, setAppAlert, dispatch, forceLog
             dispatch(setIsConnected(true))
             dispatch(setCurrentPage(APP_PAGES.MAIN))
             dispatch(loadCurrentUser(userInfo))
+            localStorage.setItem(ADDRESS_KEY, userInfo.address)
         } else {
             localStorage.clear()
             loadUserInfo(web3, account, setAppAlert, dispatch)
@@ -120,4 +120,11 @@ const validateUserAccount = async(web3, account) => {
     })
 
     return result
+}
+
+export const logOut = (dispatch) => {
+    dispatch(setIsConnected(false))
+    dispatch(setCurrentPage(APP_PAGES.LANDING))
+    dispatch(resetUserState())
+    localStorage.clear()
 }

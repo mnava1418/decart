@@ -3,7 +3,8 @@ import UsersContract from '../abis/Users.json'
 import { setWeb3, setSmartContracts, setWalletDetected } from '../store/slices/ethSlice'
 import { get } from './networkService'
 import { COINBASE_URL } from '../config'
-import { loadUserInfo } from './usersService'
+import { loadUserInfo, logOut } from './usersService'
+import { ADDRESS_KEY } from '../config'
 
 const DECIMALS = (10**18)
 
@@ -21,9 +22,26 @@ export const loadDappData = async (dispatch, setAppAlert) => {
         const web3 = loadWeb3(dispatch)
         connectUser(web3, setAppAlert, dispatch)
         loadAllContracts(web3, setAppAlert, dispatch)
+        userListener(web3, setAppAlert, dispatch)
     } else {
         setAppAlert({show: true, text: 'No wallet detected. Download ', link: 'https://metamask.io/download/', linkText: 'Metamask'})
     }
+}
+
+const userListener = (web3, setAppAlert, dispatch) => {
+    setInterval(async () => {
+        const connectedAccount = await getAccount(web3)
+        const currentAddress = localStorage.getItem(ADDRESS_KEY) == null ? undefined : localStorage.getItem(ADDRESS_KEY)
+
+        if( connectedAccount !== currentAddress) {
+            if(connectedAccount === undefined) {
+                logOut(dispatch)
+            } else if(currentAddress !== undefined) {
+                loadUserInfo(web3, connectedAccount, setAppAlert, dispatch)
+            }
+        }
+        
+    }, 1000)
 }
 
 const loadWeb3 = (dispatch) => {
